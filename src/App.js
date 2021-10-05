@@ -1,24 +1,17 @@
-import logo from './logo.svg';
-import './App.css';
+// in house components
+import Home from "./Components/Home/Home";
+import Manage from "./Components/Manage/Manage";
+// external components
+import {BrowserRouter as Router, Route, Switch} from 'react-router-dom';
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Router>
+      <Switch>  {/* renders only the first path that matches, rather than any path that matches (in theory redundant with exact) */}
+        <Route exact path='/home' component={Home} />
+        <Route exact path='/manage' component={Manage} />
+      </Switch>
+    </Router>
   );
 }
 
