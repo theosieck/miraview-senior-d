@@ -1,4 +1,9 @@
 import {useState} from 'react';
+// possibly remove some of these imports
+import {styled} from '@mui/material/styles';
+import Box from '@mui/material/Box';
+import Paper from '@mui/material/Paper';
+import Grid from '@mui/material/Grid';
 
 function Manage () {
 	return (
@@ -9,25 +14,36 @@ function Manage () {
 	);
 }
 
+// temporary code to visualize columns
+const Item = styled(Paper)(({ theme }) => ({
+	...theme.typography.body1,
+	padding: theme.spacing(1),
+	textAlign: 'center',
+	color: theme.palette.text.secondary,
+  }));
+  
+
 /*
-TODO: formatting: boxes around names, left-aligned & vertically centered, spacing btwn names, column list on left with profile to right of it
-TODO: onClick functionality for each patient name for client profile component
-TODO: hide bullet points (css)
+TODO: formatting: boxes around names, left-aligned & vertically centered, spacing btwn names, hide bullet points (css)
 TODO: change input & button for adding a new patient to just button like design?
-TODO: more checks on patient name input
+TODO: hitting enter in input presses button
 */
 function PatientList() {
 	
-	function handlePatientListClick(listIndex) {
-		// temporary
-		document.title = listIndex.toString();
+	function handlePatientListClick(index) {
+		showPatientProfile(patients[index] + ' profile here');
 	}
 
 	function handleAddPatientClick(name) {
-		if (name === '') {
-			//setInputValue('');
+		// remove all whitespaces from name
+		const testName = name.replace(/\s+/g, '');
+		
+		// if name is empty or contains characters other than letters, don't include in list
+		if (testName === '' || /[^a-zA-Z]/.test(testName)) {
+			setInputName('');
 			return;
 		}
+
 		addPatient(patients => [...patients, name]);
 		setInputName('');
 	}
@@ -37,6 +53,7 @@ function PatientList() {
 	// state hooks
 	const [patients, addPatient] = useState(names);
 	const [inputName, setInputName] = useState('');
+	const [patientFocused, showPatientProfile] = useState('');
 	
 	const listPatients = patients.map((name, index) => 
 		<ul>
@@ -48,12 +65,23 @@ function PatientList() {
 
 	return (
 		<div>
-			<b><p>{listPatients}</p></b>
+			<Box>
+				<Grid container spacing={1}>
+					<Grid item xs={3}>
+						<Item>Column 1</Item>
+						<b><p>{listPatients}</p></b>
 			
-			<input value={inputName} onChange={(e) => setInputName(e.target.value)} placeholder='Patient Name...' />
-			<button onClick={() => handleAddPatientClick(inputName)}>
-				+ New Patient
-			</button>
+						<input value={inputName} onChange={(e) => setInputName(e.target.value)} placeholder='Patient Name...' />
+						<button onClick={() => handleAddPatientClick(inputName)}>
+							+ New Patient
+						</button>
+					</Grid>
+					<Grid item xs={9}>
+						<Item>Column 2</Item>
+						<h2>{patientFocused}</h2>
+					</Grid>
+				</Grid>
+			</Box>
 		</div>
 	);
 }
