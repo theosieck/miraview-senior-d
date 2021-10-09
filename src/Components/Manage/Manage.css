@@ -1,0 +1,14 @@
+.patientList
+{
+    list-style-type: none;
+}
+
+.patientListBorder
+{
+    border: 1px solid black;
+    border-right: 2px solid blue;
+    padding: 6%;
+    margin-left: -50px;
+    margin-top: -10px;
+    text-align: center;
+}
