@@ -1,41 +1,17 @@
-import React, {useState} from 'react';
-import {useRef} from 'react';
-import './Manage.css';
-import { useDetectOutsideClick } from "./useDetectOutsideClick";
-// possibly remove some of these imports
-//import {styled} from '@mui/material/styles';
-//import Box from '@mui/material/Box';
-//import Paper from '@mui/material/Paper';
-//import Grid from '@mui/material/Grid';
-
-import Avatar from "@material-ui/core/Avatar"
-import Card from "@material-ui/core/Card"
-import { CardHeader } from '@material-ui/core';
-import Divider from "@material-ui/core/Divider"
-import Box from "@material-ui/core/Box"
+import React, {useState, useRef} from 'react';
+import {Box, Grid, Card, Divider, CardHeader, Avatar} from "@material-ui/core"
 import MoreVert from '@material-ui/icons/MoreVert'
-import Grid from '@material-ui/core/Grid'
-import {styled} from '@material-ui/core'
-import Paper from '@material-ui/core/Paper'
+import {useDetectOutsideClick} from "./useDetectOutsideClick";
+import './Manage.css';
 
 function Manage () {
 	return (
 		<div>
-			<h1>Manage Page</h1>
+			<hr />
 			<PatientList />
 		</div>
 	);
 }
-
-// temporary code to visualize columns
-const Item = styled(Paper)(({ theme }) => ({
-	...theme.typography.body1,
-	padding: theme.spacing(1),
-	textAlign: 'center',
-	color: theme.palette.text.secondary,
-  }));
-
-
 
 function stringAvatar(name) {
 	return {
@@ -43,19 +19,10 @@ function stringAvatar(name) {
 	};
 }
 
-  
 function Profile (props) {
 	const dropdownRef=useRef(null);
 	const [isActive,setIsActive]=useDetectOutsideClick(dropdownRef,false);
 	const onClick =() => setIsActive(!isActive);
-
-	
-	//window.addEventListener("mousedown",handleClickOutside);
-	//window.removeEventListener("mousedown",handleClickOutside);
-	
-	
-
-
 	
 	return (
 		<Card>
@@ -102,16 +69,10 @@ function Profile (props) {
 					<p><strong>Phone Type: </strong>Cell</p>
 				</div>
 			</div>
-
 		</Card>
 	);		
-
 }
-/*
-TODO: formatting like design
-TODO: change input & button for adding a new patient to just button like design?
-TODO: keep <ul>,<li> or switch to material ui's list, listitem, listitemtext?
-*/
+
 function PatientList() {
 	const names = ['Nicholas Gattuso', 'Essence Peters', 'Derek Morris', 'Alex Conetta', 'Gene Donovan', 'Alex Stupar', 'Nicholas Gattuso'];
 	
@@ -122,7 +83,7 @@ function PatientList() {
 
 	const listPatients = patients.map((name, index) => 
 		<ul class='patientList'>
-			<li key={index} onClick={() => handlePatientListClick(index)} class='patientListBorder'>
+			<li class='patientListBorder' key={index} onClick={() => handlePatientListClick(index)} >
 				{name}
 			</li>
 		</ul>
@@ -157,11 +118,10 @@ function PatientList() {
 			<Box>
 				<Grid container spacing={0}>
 					<Grid item xs={3}>
-						<Item>Column 1</Item>
 						<h3>{listPatients}</h3>
-						<input 	value={inputName} onChange={(e) => setInputName(e.target.value)}
+						<input 	class='addNewPatient' value={inputName} onChange={(e) => setInputName(e.target.value)}
 								onKeyDown={(e) => handleAddPatientEnterPress(e, inputName)} placeholder='Patient Name...' />
-						<button onClick={() => handleAddPatientClick(inputName)}>
+						<button class='addNewPatient' onClick={() => handleAddPatientClick(inputName)}>
 							+ New Patient
 						</button>
 					</Grid>
