@@ -1,5 +1,4 @@
 import React from 'react';
-//import { Link } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
 import { Box, Grid, Paper } from '@material-ui/core';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
@@ -17,7 +16,7 @@ function Home () {
 	const classes = useStyles();
 
 	return (
-		<div style={{ width: '90%', padding: '10px' }}>
+		<div style={{ width: '70%', padding: '5px'}}>
 			<Box>
 				<Grid container spacing={3}>
 					<Grid item xs={6} sm={3}>
