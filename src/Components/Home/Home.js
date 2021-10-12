@@ -6,22 +6,18 @@ import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import PeopleIcon from '@mui/icons-material/People';
 import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 //import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
-
-function Home () {
-	return <h1>Home Page</h1>;
-}
 const useStyles = makeStyles({
 	paper: {
 		textAlign: 'center',
 	}
 });
-  
-  
-export default function FullWidthGrid() {
-  const classes = useStyles();
-  
-	return(
-		<div>
+
+function Home () {
+	<h1>Home Page</h1>;
+	const classes = useStyles();
+
+	return
+		<div style={{ width: '90%', padding: '10px' }}>
 			<Box>
 				<Grid container spacing={3}>
 					<Grid item xs={6} sm={3}>
@@ -43,7 +39,6 @@ export default function FullWidthGrid() {
 				</Grid>
 			</Box>
 		</div>   
-	);
 }
 
-//export default Home;
+export default Home;
