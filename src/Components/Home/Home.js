@@ -16,7 +16,7 @@ function Home () {
 	<h1>Home Page</h1>;
 	const classes = useStyles();
 
-	return
+	return (
 		<div style={{ width: '90%', padding: '10px' }}>
 			<Box>
 				<Grid container spacing={3}>
@@ -25,20 +25,20 @@ function Home () {
 						</Paper>
 					</Grid>
 					<Grid item xs={6} sm={3}>
-						<PlayArrowIcon fontSize="small"></PlayArrowIcon>
-						<Paper className={classes.paper}>3 Active Today</Paper>
+						<Paper className={classes.paper}>
+							<PlayArrowIcon fontSize="small"></PlayArrowIcon>3 Active Today</Paper>
 					</Grid>
 					<Grid item xs={6} sm={3}>
-						<PeopleIcon fontSize="small"></PeopleIcon>
-						<Paper className={classes.paper}>13 Active Clients</Paper>
+						<Paper className={classes.paper}><PeopleIcon fontSize="small"></PeopleIcon>13 Active Clients</Paper>
 					</Grid>
 					<Grid item xs={6} sm={3}>
-						<ArrowUpwardIcon fontSize="small"></ArrowUpwardIcon>
-						<Paper className={classes.paper}>+10% Grounding Activations</Paper>
+						<Paper className={classes.paper}><ArrowUpwardIcon fontSize="small"></ArrowUpwardIcon>+10% Grounding Activations</Paper>
 					</Grid>
 				</Grid>
 			</Box>
-		</div>   
+		</div>
+	)
+		   
 }
 
 export default Home;
