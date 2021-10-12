@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { AppBar, Button, Grid, Tabs, Tab, Toolbar, makeStyles } from '@material-ui/core';
+import logo from './MiraLogo_1000px.png'
 
 const useStyles = makeStyles({
     tab: {
@@ -18,6 +19,9 @@ const useStyles = makeStyles({
             backgroundColor: '#fff',
             color: '#3e83dc',
         },
+    },
+    logo: {
+        maxWidth: 80
     }
 });
 
@@ -32,9 +36,9 @@ function Nav() {
     return <nav>
         <AppBar className={classes.appbar} position="static" color="default">
             <Toolbar>
-                <Grid justify={"space-between"} container>
+                <Grid alignItems="center" justify={"space-between"} container>
                     <Grid xs={1} sm={1} md={1} item>
-                        <img src="MiraLogo_1000px.png" alt="Mira Logo"/>
+                        <img className={classes.logo} src={logo} alt="Mira Logo"/>
                     </Grid>
                     <Grid xs={10} sm={10} md={10} item>
                             <Tabs
