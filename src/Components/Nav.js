@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import { Link } from 'react-router-dom';
 import { AppBar, Button, Grid, Tabs, Tab, Toolbar, makeStyles } from '@material-ui/core';
 import logo from './MiraLogo_1000px.png'
@@ -25,13 +25,25 @@ const useStyles = makeStyles({
     }
 });
 
-function Nav() {
+function Nav(props) {
     const [value, setValue] = React.useState(0);
     const classes = useStyles();
+    const tabs = ['/home', '/population', '/manage', '/settings'];
   
     const handleChange = (event, newValue) => {
       setValue(newValue);
     };
+
+    useEffect(() => {
+        // get the page we're on
+        const newValue = window.location.pathname;
+        console.log(newValue);
+
+        // get its position in the menu
+        const newIndex = tabs.indexOf(newValue);
+        // if it exists in the menu, set the new active value
+        if (newIndex>=0) setValue(newIndex);
+    }, [window.location.pathname]);
 
     return <nav>
         <AppBar className={classes.appbar} position="static" color="default">
