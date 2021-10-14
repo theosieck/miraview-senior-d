@@ -2,6 +2,8 @@ import React, {useState, useRef} from 'react';
 import {Box, Grid, Card, Divider, CardHeader, Avatar} from "@material-ui/core"
 import MoreVert from '@material-ui/icons/MoreVert'
 import {useDetectOutsideClick} from "./useDetectOutsideClick";
+import {List, ListItemButton, ListItemIcon, ListItemText} from '@mui/material'
+import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
 import './Manage.css';
 
 function Manage () {
@@ -73,23 +75,29 @@ function Profile (props) {
 	);		
 }
 
+// TODO: formatting/design
 function PatientList() {
 	const names = ['Nicholas Gattuso', 'Essence Peters', 'Derek Morris', 'Alex Conetta', 'Gene Donovan', 'Alex Stupar', 'Nicholas Gattuso'];
 	
 	// state hooks
 	const [patients, addPatient] = useState(names);
-	const [inputName, setInputName] = useState('');
-	const [patientFocused, showPatientProfile] = useState('');
+	const [inputName, setInputName] = useState(null);
+	const [patientFocused, showPatientProfile] = useState(null);
+	const [selectedIndex, setSelectedIndex] = useState(null);
 
 	const listPatients = patients.map((name, index) => 
-		<ul class='patientList'>
-			<li class='patientListBorder' key={index} onClick={() => handlePatientListClick(index)} >
-				{name}
-			</li>
-		</ul>
+		<List component = 'nav' sx={{border: 1}}>
+			<ListItemButton selected={selectedIndex === index} onClick={() => handlePatientListClick(index)}>
+				<ListItemIcon>
+					<PersonOutlineIcon />
+				</ListItemIcon>
+				<ListItemText primary={name} />
+			</ListItemButton>
+		</List>
 	);
 	
 	function handlePatientListClick(index) {
+		setSelectedIndex(index);
 		showPatientProfile(<Profile name={patients[index]} />);
 	}
 
@@ -118,7 +126,7 @@ function PatientList() {
 			<Box>
 				<Grid container spacing={0}>
 					<Grid item xs={3}>
-						<h3>{listPatients}</h3>
+						<p>{listPatients}</p>
 						<input 	class='addNewPatient' value={inputName} onChange={(e) => setInputName(e.target.value)}
 								onKeyDown={(e) => handleAddPatientEnterPress(e, inputName)} placeholder='Patient Name...' />
 						<button class='addNewPatient' onClick={() => handleAddPatientClick(inputName)}>
