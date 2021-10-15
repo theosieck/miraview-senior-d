@@ -25,6 +25,11 @@ const useStyles = makeStyles({
 });
 
 function stringAvatar(name) {
+	if (name.indexOf(' ') === -1) {
+		return {
+			children: `${name}`
+		};
+	}
 	return {
 		children: `${name.split(' ')[0][0]}${name.split(' ')[1][0]}`,
 	};
