@@ -1,12 +1,12 @@
 import React, {useState, useRef} from 'react';
-import {Box, Grid, Card, Divider, CardHeader, Avatar} from "@material-ui/core"
+import {Box, Grid, Card, Divider, CardHeader, Avatar, Typography, makeStyles} from "@material-ui/core"
 import MoreVert from '@material-ui/icons/MoreVert'
 import {useDetectOutsideClick} from "./useDetectOutsideClick";
 import {List, ListItemButton, ListItemIcon, ListItemText} from '@mui/material'
 import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
 import './Manage.css';
 
-function Manage () {
+function Manage() {
 	return (
 		<div>
 			<hr />
@@ -14,6 +14,15 @@ function Manage () {
 		</div>
 	);
 }
+
+const useStyles = makeStyles({
+	list: {
+		border: '1px solid black',
+		'&:hover': {
+            backgroundColor: '#DBF3FA',
+        },
+	}
+});
 
 function stringAvatar(name) {
 	return {
@@ -75,8 +84,8 @@ function Profile (props) {
 	);		
 }
 
-// TODO: formatting/design
 function PatientList() {
+	const classes = useStyles();
 	const names = ['Nicholas Gattuso', 'Essence Peters', 'Derek Morris', 'Alex Conetta', 'Gene Donovan', 'Alex Stupar', 'Nicholas Gattuso'];
 	
 	// state hooks
@@ -86,12 +95,16 @@ function PatientList() {
 	const [selectedIndex, setSelectedIndex] = useState(null);
 
 	const listPatients = patients.map((name, index) => 
-		<List component = 'nav' sx={{border: 1}}>
+		<List component='nav' className={classes.list}>
 			<ListItemButton selected={selectedIndex === index} onClick={() => handlePatientListClick(index)}>
 				<ListItemIcon>
 					<PersonOutlineIcon />
 				</ListItemIcon>
-				<ListItemText primary={name} />
+				<ListItemText disableTypography primary={
+					<Typography variant='h5'>
+						{name}
+					</Typography>
+				}/>
 			</ListItemButton>
 		</List>
 	);
@@ -125,7 +138,7 @@ function PatientList() {
 		<div>
 			<Box>
 				<Grid container spacing={0}>
-					<Grid item xs={3}>
+					<Grid item xs={2}>
 						<p>{listPatients}</p>
 						<input 	class='addNewPatient' value={inputName} onChange={(e) => setInputName(e.target.value)}
 								onKeyDown={(e) => handleAddPatientEnterPress(e, inputName)} placeholder='Patient Name...' />
@@ -133,7 +146,7 @@ function PatientList() {
 							+ New Patient
 						</button>
 					</Grid>
-					<Grid item xs={9}>
+					<Grid item xs={10}>
 						<div>{patientFocused}</div>
 					</Grid>
 				</Grid>
