@@ -1,17 +1,3 @@
-.patientList
-{
-    list-style-type: none;
-}
-
-.patientListBorder
-{
-    border: 1px solid black;
-    padding: 6%;
-    margin-left: -50px;
-    margin-top: -15px;
-    text-align: center;
-}
-
 .addNewPatient
 {
     margin:0 auto;
