@@ -110,7 +110,7 @@ function ClientGrid()
 
 	return(
 		<Box>
-			<Grid container spacing={0} xs={11}>
+			<Grid container spacing={0} xs={11} className="outer-grid">
 				{clientList}
 			</Grid>
 		</Box>
