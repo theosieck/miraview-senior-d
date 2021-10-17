@@ -22,3 +22,8 @@
 {
     margin: auto !important;
 }
+
+.MuiGrid-container
+{
+    align-items: center;
+}

@@ -60,14 +60,14 @@ function ClientRow(props)
 		name
 	} = props;
 	return (
-		<Grid container spacing={0} xs={11}>
+		<Grid container spacing={0} xs={12} >
 			<Grid item xs={3}>
 				<h3 className="name">{name}</h3>
 				<h4 className="age">Age: 42</h4>
 			</Grid>
-			<Grid item xs={3}>
+			<Grid item xs={3} alignItems="center">
 				<Grid container spacing={0}>
-					<Grid className="verticalCenter" item xs={2}>
+					<Grid item xs={2}>
 						<TrendingDownIcon fontSize="large"></TrendingDownIcon>
 					</Grid>
 					<Grid item xs={4}>
@@ -81,7 +81,7 @@ function ClientRow(props)
 			</Grid>
 			<Grid item xs={3}>
 				<Grid container spacing={0}>
-					<Grid className="verticalCenter" item xs={2}>
+					<Grid item xs={2}>
 						<TrendingUpIcon fontSize="large"></TrendingUpIcon>
 					</Grid>
 					<Grid item xs={4}>
@@ -110,7 +110,7 @@ function ClientGrid()
 
 	return(
 		<Box>
-			<Grid container spacing={0}>
+			<Grid container spacing={0} xs={11}>
 				{clientList}
 			</Grid>
 		</Box>
