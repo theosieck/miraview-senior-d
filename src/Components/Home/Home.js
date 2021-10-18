@@ -60,20 +60,27 @@ function ClientRow(props)
 		name
 	} = props;
 	return (
-		<Grid container spacing={0} xs={12} >
+		<Grid container>
 			<Grid item xs={3}>
-				<h3 className="name">{name}</h3>
-				<h4 className="age">Age: 42</h4>
+				<Grid container spacing={0}>
+					<Grid item xs={3}>
+						<Avatar/>
+					</Grid>
+					<Grid item xs={9}>
+						<h3 className="name">{name}</h3>
+						<h4 className="age">Age: 42</h4>
+					</Grid>
+				</Grid>
 			</Grid>
-			<Grid item xs={3} alignItems="center">
+			<Grid item xs={3}>
 				<Grid container spacing={0}>
 					<Grid item xs={2}>
 						<TrendingDownIcon fontSize="large"></TrendingDownIcon>
 					</Grid>
-					<Grid item xs={4}>
-						<h3 className="score">-5%</h3>
+					<Grid item xs={2}>
+						<h3>-5%</h3>
 					</Grid>
-					<Grid item xs={6}>
+					<Grid item xs={8}>
 						<h4>Symptom Scores</h4>
 					</Grid>
 				</Grid>
@@ -84,16 +91,16 @@ function ClientRow(props)
 					<Grid item xs={2}>
 						<TrendingUpIcon fontSize="large"></TrendingUpIcon>
 					</Grid>
-					<Grid item xs={4}>
-						<h3 className="score">+10%</h3>
+					<Grid item xs={2}>
+						<h3>+10%</h3>
 					</Grid>
-					<Grid item xs={6}>
+					<Grid item xs={8}>
 						<h4 style={{marginLeft: '15px'}}>Grounding Activations</h4>
 					</Grid>
 				</Grid>
 			</Grid>
 			<Grid item xs={3}>
-				<Button>View Patient Data<ArrowRightAlt></ArrowRightAlt></Button>
+				<Button variant="contained">View Patient Data<ArrowRightAlt></ArrowRightAlt></Button>
 			</Grid>
 		</Grid>
 	);
@@ -110,7 +117,7 @@ function ClientGrid()
 
 	return(
 		<Box>
-			<Grid container spacing={0} xs={11}>
+			<Grid container spacing={0} justifyContent="space-evenly">
 				{clientList}
 			</Grid>
 		</Box>

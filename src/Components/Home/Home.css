@@ -1,6 +1,7 @@
 .individualRow
 {
     border-bottom: 1px black solid;
+    min-width: 80%;
 }
 
 .name
@@ -11,11 +12,6 @@
 .age
 {
     margin-block-start: 0;
-}
-
-.score
-{
-    margin: 50% 25%;
 }
 
 .verticalCenter
