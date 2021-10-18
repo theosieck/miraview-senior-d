@@ -1,0 +1,31 @@
+.individualRow
+{
+    border-bottom: 1px black solid;
+    min-width: 80%;
+}
+
+.name
+{
+    margin-block-end: 0;
+}
+
+.age
+{
+    margin-block-start: 0;
+}
+
+.verticalCenter
+{
+    margin: auto !important;
+}
+
+.MuiGrid-container
+{
+    align-items: center;
+}
+
+.outer-grid {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
