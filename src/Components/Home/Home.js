@@ -117,7 +117,7 @@ function ClientGrid()
 
 	return(
 		<Box>
-			<Grid container spacing={0} justifyContent="space-evenly">
+			<Grid container spacing={0} className="outer-grid" justifyContent="space-evenly">
 				{clientList}
 			</Grid>
 		</Box>
