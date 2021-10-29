@@ -11,12 +11,12 @@ export const userSlice = createSlice({
 		// log the user in and set their id and user data
 		login: (state, action) => {
 			console.log(action);
-			state.loggedIn = !state.loggedIn;
+			state.loggedIn = true;
 			state.id = action.payload.id;
 			state.data = action.payload.data;
 		},
 		logout: (state) => {
-			state.loggedIn = !state.loggedIn;
+			state.loggedIn = false;
 			state.id = null;
 			state.data = null;
 		}

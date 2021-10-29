@@ -2,7 +2,7 @@
 import { useSelector, useDispatch } from "react-redux";
 import { Redirect } from 'react-router-dom';
 import { Button,TextField } from '@mui/material';
-import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from 'firebase/auth';
 import { auth } from "../firebase/Firebase";
 import { login} from '../slices/userSlice';
 
@@ -16,14 +16,12 @@ const getDummyData = () => {
 }
 
 // TODO styling
-/**
- * QUESTIONS
- * should anyone in the firebase users tab be able to log in or do we need to add some sort of logic so that it's only therapists?
- */
 
 export default function Login() {
 	const userData = useSelector((state) => state.user);
+	console.log(userData);
 	const dispatch = useDispatch();
+	// console.log(auth);
 
 	// TESTING ONLY
 	const createUser = async () => {
@@ -45,7 +43,7 @@ export default function Login() {
 		// get inputs
 		const email = document.getElementById('email').value;
 		const password = document.getElementById('password').value;
-		console.log(email, password);
+		// console.log(email, password);
 
 		// do some input checks before we send to firebase - TODO
 
@@ -53,7 +51,7 @@ export default function Login() {
 		let result;
 		try {
 			result = await signInWithEmailAndPassword(auth, email, password);
-			console.log(result);
+			// console.log(auth);
 		} catch (err) {
 			console.log(err);
 			// handle error - TODO
@@ -77,15 +75,22 @@ export default function Login() {
 		// if successful, pull data from firebase - eddie your stuff goes here
 		const user = getDummyData();
 
-		// send dispatch to redux
-		dispatch(login({
-			id: user.id,
-			data: user
-		}));
+		// if we did not get a user, call signOut() and don't log the user in
+		// eddie you might have to change this conditional depending on what the return for not finding a user is
+		if (!user) {
+			// sign out of firebase auth
+			await signOut(auth);
+		} else {
+			// send dispatch to redux
+			dispatch(login({
+				id: user.id,
+				data: user
+			}));
+		}
 	}
 
 	// if user is logged in redirect to homepage
-	if (userData.loggedIn) return <Redirect to='/home'/>;
+	if (userData && userData.loggedIn) return <Redirect to='/home'/>;
 
 	return (
 		<>
