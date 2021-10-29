@@ -2,9 +2,9 @@
 import { useSelector, useDispatch } from "react-redux";
 import { Redirect } from 'react-router-dom';
 import { Button,TextField } from '@mui/material';
-import { signInWithEmailAndPassword } from 'firebase/auth';
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth } from "../firebase/Firebase";
-import { login, logout } from '../slices/userSlice';
+import { login} from '../slices/userSlice';
 
 const getDummyData = () => {
 	return {
@@ -18,13 +18,24 @@ const getDummyData = () => {
 // TODO styling
 /**
  * QUESTIONS
- * can we make test users?
  * should anyone in the firebase users tab be able to log in or do we need to add some sort of logic so that it's only therapists?
  */
 
 export default function Login() {
 	const userData = useSelector((state) => state.user);
 	const dispatch = useDispatch();
+
+	// TESTING ONLY
+	const createUser = async () => {
+		let result;
+		try {
+			result = await createUserWithEmailAndPassword(auth, 'testing@test.test', '1234test');
+			console.log ('user should be created');
+			console.log(result);
+		} catch (e) {
+			console.log(e);
+		}
+	}
 
 	// login function
 	const logUserIn = async (e) => {
@@ -73,20 +84,20 @@ export default function Login() {
 		}));
 	}
 
-	// TODO where should log out functionality be? in navbar?
-	// dispatch(logout())
-
 	// if user is logged in redirect to homepage
 	if (userData.loggedIn) return <Redirect to='/home'/>;
 
 	return (
 		<>
 			<h1>Log In</h1>
+			{/* <button onClick={createUser}>Create Test User</button> */}
 			<form id='login-form' onSubmit={logUserIn}>
 				<TextField id='email' label='Email' variant='outlined' />
 				<TextField id='password' label='Password' variant='outlined' type='password' />
 				<Button type='submit'>Login</Button>
 			</form>
+
+			<p>Test user info: email: testing@test.test, password: 1234test</p>
 		</>
 	)
 }
