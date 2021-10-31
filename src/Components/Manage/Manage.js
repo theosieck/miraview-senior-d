@@ -1,4 +1,6 @@
 import React, {useState, useRef} from 'react';
+import { useSelector, useDispatch } from "react-redux";
+import { Redirect } from 'react-router-dom';
 import {Box, Grid, Card, Divider, CardHeader, Avatar, Typography, makeStyles} from "@material-ui/core"
 import MoreVert from '@material-ui/icons/MoreVert'
 import {useDetectOutsideClick} from "./useDetectOutsideClick";
@@ -7,6 +9,11 @@ import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
 import './Manage.css';
 
 function Manage() {
+	// redirect to / if not logged in
+	const userData = useSelector((state) => state.user);
+	console.log(userData);
+	if (!userData.loggedIn) return <Redirect to='/'/>;
+
 	return (
 		<div>
 			<hr />

@@ -1,7 +1,11 @@
 import React, {useEffect} from 'react';
 import { Link } from 'react-router-dom';
 import { AppBar, Button, Grid, Tabs, Tab, Toolbar, makeStyles } from '@material-ui/core';
-import logo from './MiraLogo_1000px.png'
+import { useDispatch } from 'react-redux';
+import { signOut } from 'firebase/auth';
+import logo from './MiraLogo_1000px.png';
+import { auth } from '../firebase/Firebase';
+import { logout } from '../slices/userSlice';
 
 const useStyles = makeStyles({
     tab: {
@@ -26,6 +30,7 @@ const useStyles = makeStyles({
 });
 
 function Nav(props) {
+	const dispatch = useDispatch();
     const [value, setValue] = React.useState(0);
     const classes = useStyles();
     const tabs = ['/home', '/population', '/manage', '/settings'];
@@ -44,6 +49,14 @@ function Nav(props) {
         // if it exists in the menu, set the new active value
         if (newIndex>=0) setValue(newIndex);
     }, [window.location.pathname]);
+
+    const logUserOut = async () => {
+        console.log('logging out...');
+        // log user out in firebase
+        signOut(auth);
+        // send dispatch to log user out in redux
+        dispatch(logout());
+    }
 
     return <nav>
         <AppBar className={classes.appbar} position="static" color="default">
@@ -86,7 +99,7 @@ function Nav(props) {
                             </Tabs>
                         </Grid>
                     <Grid item xs={1} sm={1} md={1}>
-                        <Button className={classes.logoutButton} variant="contained">Log Out</Button>
+                        <Button className={classes.logoutButton} variant="contained" onClick={logUserOut}>Log Out</Button>
                     </Grid>
                 </Grid>
             </Toolbar>

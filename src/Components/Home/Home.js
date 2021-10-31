@@ -1,4 +1,6 @@
 import React from 'react';
+import { useSelector, useDispatch } from "react-redux";
+import { Redirect } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
 import { Box, Grid, Paper, Avatar } from '@material-ui/core';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
@@ -18,7 +20,11 @@ const useStyles = makeStyles({
 
 
 function Home () {
-
+	// redirect to / if not logged in
+	const userData = useSelector((state) => state.user);
+	console.log(userData);
+	if (!userData.loggedIn) return <Redirect to='/'/>;
+	
 	return(
 		<div>
 			<ClientOverview/>
