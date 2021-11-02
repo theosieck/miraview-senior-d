@@ -5,6 +5,7 @@ import { Button,TextField } from '@mui/material';
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from 'firebase/auth';
 import { auth } from "../firebase/Firebase";
 import { login} from '../slices/userSlice';
+import { useState } from "react";
 
 const getDummyData = () => {
 	return {
@@ -21,6 +22,7 @@ export default function Login() {
 	const userData = useSelector((state) => state.user);
 	console.log(userData);
 	const dispatch = useDispatch();
+	let error;
 	// console.log(auth);
 
 	// TESTING ONLY
@@ -39,6 +41,8 @@ export default function Login() {
 	const logUserIn = async (e) => {
 		// prevent default
 		e.preventDefault();
+		// reset error
+		error = null;
 
 		// get inputs
 		const email = document.getElementById('email').value;
@@ -53,7 +57,9 @@ export default function Login() {
 			result = await signInWithEmailAndPassword(auth, email, password);
 			// console.log(auth);
 		} catch (err) {
+			error = err;
 			console.log(err);
+			alert(err);
 			// handle error - TODO
 			/** errors look like this
 			 * {
@@ -73,19 +79,22 @@ export default function Login() {
 		}
 
 		// if successful, pull data from firebase - eddie your stuff goes here
-		const user = getDummyData();
+		console.log(error);
+		if (!error) {
+			const user = getDummyData();
 
-		// if we did not get a user, call signOut() and don't log the user in
-		// eddie you might have to change this conditional depending on what the return for not finding a user is
-		if (!user) {
-			// sign out of firebase auth
-			await signOut(auth);
-		} else {
-			// send dispatch to redux
-			dispatch(login({
-				id: user.id,
-				data: user
-			}));
+			// if we did not get a user, call signOut() and don't log the user in
+			// eddie you might have to change this conditional depending on what the return for not finding a user is
+			if (!user) {
+				// sign out of firebase auth
+				await signOut(auth);
+			} else {
+				// send dispatch to redux
+				dispatch(login({
+					id: user.id,
+					data: user
+				}));
+			}
 		}
 	}
 
