@@ -6,6 +6,7 @@ import { signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } f
 import { auth } from "../firebase/Firebase";
 import { login} from '../slices/userSlice';
 import { useState } from "react";
+import { getClientsList } from "../firebase/Firebase";
 
 const getDummyData = () => {
 	return {
@@ -56,6 +57,9 @@ export default function Login() {
 		try {
 			result = await signInWithEmailAndPassword(auth, email, password);
 			// console.log(auth);
+			// console.log(result);
+			// const res = await getClientsList(null, auth);
+			// console.log(res);
 		} catch (err) {
 			error = err;
 			console.log(err);
