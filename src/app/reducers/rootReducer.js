@@ -1,10 +1,10 @@
 import { combineReducers } from 'redux';
-// import userReducer from '../../slices/userSlice';
 import userReducer from './userReducer';
-// any other reducers go here!
+import clientReducer from './clientReducer';
 
 const rootReducer = combineReducers({
-	user:userReducer
+	user: 	userReducer,
+	client:	clientReducer
 });
 
 export default rootReducer;

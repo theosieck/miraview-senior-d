@@ -22,6 +22,9 @@ const useStyles = makeStyles({
 
 
 function Home () {
+	const clientsData = useSelector((state) => state.client);
+	console.log(clientsData);
+	
 	// redirect to / if not logged in
 	const userData = useSelector((state) => state.user);
 	console.log(userData);
@@ -30,7 +33,7 @@ function Home () {
 	// testing to make sure auth will work across pages
 	const testFN = async () => {
 		const res = await getClientsList(null, auth);
-		console.log(res);
+		//console.log(res);
 	}
 
 	testFN();
