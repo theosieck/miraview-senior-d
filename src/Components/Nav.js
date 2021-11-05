@@ -55,7 +55,9 @@ function Nav(props) {
         // log user out in firebase
         signOut(auth);
         // send dispatch to log user out in redux
-        dispatch(logout());
+        dispatch({
+            type: 'LOG_OUT'
+        });
     }
 
     return <nav>
