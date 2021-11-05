@@ -1,3 +1,7 @@
+/**
+ * DON'T MAKE SLICES! THIS IS A TEMPLATE FOR HOW THE SLICES MAP TO THE REDUCERS IN ./REDUCERS
+ */
+
 import { createSlice } from "@reduxjs/toolkit";
 
 export const userSlice = createSlice({

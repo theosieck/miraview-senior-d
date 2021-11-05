@@ -4,7 +4,7 @@ import { Redirect } from 'react-router-dom';
 import { Button,TextField } from '@mui/material';
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from 'firebase/auth';
 import { auth } from "../firebase/Firebase";
-import { login} from '../slices/userSlice';
+// import { login} from '../slices/userSlice';
 import { useState } from "react";
 import { getClientsList } from "../firebase/Firebase";
 
@@ -93,11 +93,15 @@ export default function Login() {
 				// sign out of firebase auth
 				await signOut(auth);
 			} else {
+				console.log('tried to log in');
 				// send dispatch to redux
-				dispatch(login({
-					id: user.id,
-					data: user
-				}));
+				dispatch({
+					type: 'LOG_IN',
+					payload: {
+						id: user.id,
+						data: user
+					}
+				});
 			}
 		}
 	}
