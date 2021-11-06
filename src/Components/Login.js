@@ -6,7 +6,7 @@ import { signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } f
 import { auth } from "../firebase/Firebase";
 // import { login} from '../slices/userSlice';
 import { useState } from "react";
-import { getClientsList } from "../firebase/Firebase";
+import { getClientsList, getClientStatistics } from "../firebase/Firebase";
 
 const getDummyData = () => {
 	return {
@@ -17,14 +17,45 @@ const getDummyData = () => {
 	}
 }
 
+const storeClientStatistics = async (dispatch) => {
+	// pull client statistics data from firebase
+	let clientStatisticsData;
+	try {
+		let clientStatistics = await getClientStatistics(null, auth);
+		console.log('--Client Statistics Data Here--');
+		//console.log(clientStatistics);
+		// .data gives {code:..., data:...} so do .data.data
+		clientStatisticsData = clientStatistics.data.data;
+		//console.log(clientStatisticsData);
+	} catch (e) {
+		console.log(e);
+		alert(e);
+	}
+
+	// update redux store with client statistics data
+	dispatch({
+		type: 'SET_CLIENT_STATISTICS_DATA',
+		payload: {
+			ids: 					clientStatisticsData.map(function(x) {return x.id}),
+			groundingActivations: 	clientStatisticsData.map(function(x) {return x.groundingActivations}),
+			symptomReports: 		clientStatisticsData.map(function(x) {return x.symptomReports})
+		}
+	})
+}
+
 // TODO styling
 
 export default function Login() {
+	// userReducer
 	const userData = useSelector((state) => state.user);
 	console.log(userData);
 	const dispatch = useDispatch();
 	let error;
 	// console.log(auth);
+
+	// clientReducer
+	const clientsData = useSelector((state) => state.client);
+	console.log(clientsData);
 
 	// TESTING ONLY
 	const createUser = async () => {
@@ -83,10 +114,13 @@ export default function Login() {
 		}
 
 		// if successful, pull data from firebase - eddie your stuff goes here
-		console.log(error);
+		//console.log(error);
 		if (!error) {
 			const user = getDummyData();
 
+			// gets from firebase and stores in redux the client statistics
+			storeClientStatistics(dispatch);
+			
 			// if we did not get a user, call signOut() and don't log the user in
 			// eddie you might have to change this conditional depending on what the return for not finding a user is
 			if (!user) {

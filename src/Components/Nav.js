@@ -58,6 +58,10 @@ function Nav(props) {
         dispatch({
             type: 'LOG_OUT'
         });
+        // send dispatch to clear client statistics in redux
+        dispatch({
+            type: 'CLEAR_CLIENT_STATISTICS_DATA'
+        })
     }
 
     return <nav>
