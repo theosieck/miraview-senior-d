@@ -1,7 +1,7 @@
 import React, {useState, useRef} from 'react';
 import { useSelector, useDispatch } from "react-redux";
 import { Redirect } from 'react-router-dom';
-import {Box, Grid, Card, Divider, CardHeader, Avatar, Typography, makeStyles} from "@material-ui/core"
+import {Box, Grid, Button, TextField, Card, Divider, CardHeader, Avatar, Typography, makeStyles} from "@material-ui/core"
 import MoreVert from '@material-ui/icons/MoreVert'
 import {useDetectOutsideClick} from "./useDetectOutsideClick";
 import {List, ListItemButton, ListItemIcon, ListItemText} from '@mui/material'
@@ -59,7 +59,7 @@ function Profile (props) {
 							<button onClick={onClick} className="menu-trigger">
 								<MoreVert />
 							</button>
-							<nav ref={dropdownRef} 
+							<div ref={dropdownRef} 
 								className={`menu ${isActive ? "active" : "inactive"}`}>
 								<ul>
 									<li>
@@ -69,7 +69,7 @@ function Profile (props) {
 										Deactive
 									</li>
 								</ul>
-							</nav>
+							</div>
 						</div>
 					</div>
 					
@@ -107,7 +107,7 @@ function PatientList() {
 	const [selectedIndex, setSelectedIndex] = useState(null);
 
 	const listPatients = patients.map((name, index) => 
-		<List component='nav' className={classes.list}>
+		<List component='div' className={classes.list}>
 			<ListItemButton selected={selectedIndex === index} onClick={() => handlePatientListClick(index)}>
 				<ListItemIcon>
 					<PersonOutlineIcon />
@@ -150,15 +150,15 @@ function PatientList() {
 		<div>
 			<Box>
 				<Grid container spacing={0}>
-					<Grid item xs={2}>
-						<p>{listPatients}</p>
-						<input 	class='addNewPatient' value={inputName} onChange={(e) => setInputName(e.target.value)}
+					<Grid item xs={3}>
+						<div>{listPatients}</div>
+						<TextField 	className='addNewPatient' value={inputName} onChange={(e) => setInputName(e.target.value)}
 								onKeyDown={(e) => handleAddPatientEnterPress(e, inputName)} placeholder='Patient Name...' />
-						<button class='addNewPatient' onClick={() => handleAddPatientClick(inputName)}>
+						<Button variant="contained" className='addNewPatient' onClick={() => handleAddPatientClick(inputName)}>
 							+ New Patient
-						</button>
+						</Button>
 					</Grid>
-					<Grid item xs={10}>
+					<Grid item xs={9}>
 						<div>{patientFocused}</div>
 					</Grid>
 				</Grid>

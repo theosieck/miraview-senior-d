@@ -35,24 +35,19 @@ function Home () {
 
 function ClientOverview()
 {
-	const classes = useStyles();
 	return (
-		<div style={{ width: '70%', padding: '5px'}}>
+		<div style={{ width: '70%', borderBottom: '1px solid gray', marginBottom: "10px"}}>
 			<Box>
-				<Grid container spacing={3}>
+				<Grid container spacing={0}>
 					<Grid item xs={6} sm={3}>
-						<Paper className={classes.paper}>My Clients
-						</Paper>
+						<h4 style={{margin:'10px', padding:'10px', marginRight:'20px', textAlign:"center", borderRight: "1px solid gray"}}>My Clients
+						</h4>
 					</Grid>
 					<Grid item xs={6} sm={3}>
-						<Paper className={classes.paper}>
-							<PlayArrowIcon fontSize="small"></PlayArrowIcon>3 Active Today</Paper>
+						<PlayArrowIcon fontSize="small"></PlayArrowIcon>3 Active Today
 					</Grid>
 					<Grid item xs={6} sm={3}>
-						<Paper className={classes.paper}><PeopleIcon fontSize="small"></PeopleIcon>13 Active Clients</Paper>
-					</Grid>
-					<Grid item xs={6} sm={3}>
-						<Paper className={classes.paper}><ArrowUpwardIcon fontSize="small"></ArrowUpwardIcon>+10% Grounding Activations</Paper>
+						<PeopleIcon fontSize="small"></PeopleIcon>13 Active Clients
 					</Grid>
 				</Grid>
 			</Box>
