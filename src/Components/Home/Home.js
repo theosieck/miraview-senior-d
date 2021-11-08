@@ -13,13 +13,6 @@ import ArrowRightAlt from '@mui/icons-material/ArrowRightAlt';
 
 import {auth, getClientsList} from '../../firebase/Firebase';
 //import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
-const useStyles = makeStyles({
-	paper: {
-		textAlign: 'center',
-	}
-});
-
-
 
 function Home () {
 	const clientsData = useSelector((state) => state.client);
@@ -30,6 +23,7 @@ function Home () {
 	console.log(userData);
 	if (!userData.loggedIn) return <Redirect to='/'/>;
 
+	let activeClientsInfo = userData.data.data.data.clients.length;
 	// testing to make sure auth will work across pages
 	const testFN = async () => {
 		const res = await getClientsList(null, auth);
@@ -40,14 +34,15 @@ function Home () {
 	
 	return(
 		<div>
-			<ClientOverview/>
-			<ClientGrid></ClientGrid>
+			<ClientOverview activeClients={activeClientsInfo}/>
+			<ClientGrid clientInfo={clientsData}></ClientGrid>
 		</div>
 	);	   
 }
 
-function ClientOverview()
+function ClientOverview(props)
 {
+	let activeClients = props.activeClients
 	return (
 		<div style={{ width: '70%', borderBottom: '1px solid gray', marginBottom: "10px"}}>
 			<Box>
@@ -60,7 +55,7 @@ function ClientOverview()
 						<PlayArrowIcon fontSize="small"></PlayArrowIcon>3 Active Today
 					</Grid>
 					<Grid item xs={6} sm={3}>
-						<PeopleIcon fontSize="small"></PeopleIcon>13 Active Clients
+						<PeopleIcon fontSize="small"></PeopleIcon>{activeClients} Active Clients
 					</Grid>
 				</Grid>
 			</Box>
@@ -70,9 +65,13 @@ function ClientOverview()
 
 function ClientRow(props)
 {
-	const {
-		name
-	} = props;
+	const info = {
+		clientName: props.name,
+		id: props.id,
+		groundingActivations: props.groundingActivations || 0,
+		symptomReports: props.symptomReports || 0
+	};
+
 	return (
 		<Grid container>
 			<Grid item xs={3}>
@@ -81,7 +80,7 @@ function ClientRow(props)
 						<Avatar/>
 					</Grid>
 					<Grid item xs={9}>
-						<h3 className="name">{name}</h3>
+						<h3 className="name">{info.clientName}</h3>
 						<h4 className="age">Age: 42</h4>
 					</Grid>
 				</Grid>
@@ -92,7 +91,7 @@ function ClientRow(props)
 						<TrendingDownIcon fontSize="large"></TrendingDownIcon>
 					</Grid>
 					<Grid item xs={2}>
-						<h3>-5%</h3>
+						<h3>{info.symptomReports}</h3>
 					</Grid>
 					<Grid item xs={8}>
 						<h4>Symptom Scores</h4>
@@ -106,7 +105,7 @@ function ClientRow(props)
 						<TrendingUpIcon fontSize="large"></TrendingUpIcon>
 					</Grid>
 					<Grid item xs={2}>
-						<h3>+10%</h3>
+						<h3>{info.groundingActivations}</h3>
 					</Grid>
 					<Grid item xs={8}>
 						<h4 style={{marginLeft: '15px'}}>Grounding Activations</h4>
@@ -120,12 +119,14 @@ function ClientRow(props)
 	);
 }
 
-function ClientGrid()
+function ClientGrid(props)
 {
-	const names = ['Nicholas Gattuso', 'Essence Peters', 'Derek Morris', 'Alex Conetta', 'Gene Donovan', 'Alex Stupar', 'Nicholas Gattuso'];
-	const clientList = names.map((name, index) =>
+	let clientInfo = props.clientInfo;
+	let ids = clientInfo.ids;
+	const names = ['Nicholas Gattuso', 'Essence Peters'];
+	const clientList = ids.map((id, index) =>
 		<div className="individualRow">
-			<ClientRow name={name}></ClientRow>
+			<ClientRow id={id} name={id} groundingActivations={clientInfo.groundingActivations[index].allTime || 0} symptomReports={clientInfo.symptomReports[index].allTime || 0}></ClientRow>
 		</div>
 		);
 

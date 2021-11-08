@@ -98,6 +98,7 @@ function Profile (props) {
 
 function PatientList() {
 	const classes = useStyles();
+	//TODO - Switch names with actual patient info
 	const names = ['Nicholas Gattuso', 'Essence Peters', 'Derek Morris', 'Alex Conetta', 'Gene Donovan', 'Alex Stupar', 'Nicholas Gattuso'];
 	
 	// state hooks
