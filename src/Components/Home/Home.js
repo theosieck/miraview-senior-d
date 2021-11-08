@@ -127,7 +127,7 @@ function ClientGrid(props)
 	let clientStats = props.clientStats;
 	const clientInfoList = clientList.map(({id, name}, index) =>
 		<div className="individualRow">
-			<ClientRow id={id} name={name} groundingActivations={clientStats.groundingActivations[index].allTime || 0} symptomReports={clientStats.symptomReports[index].allTime || 0}></ClientRow>
+			<ClientRow id={id} name={name} groundingActivations={clientStats.groundingActivations[index] ? clientStats.groundingActivations[index].allTime : 0} symptomReports={clientStats.symptomReports[index] ? clientStats.symptomReports[index].allTime : 0}></ClientRow>
 		</div>
 		);
 
