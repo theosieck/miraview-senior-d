@@ -15,19 +15,21 @@ import {auth, getClientsList} from '../../firebase/Firebase';
 //import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 
 function Home () {
-	const clientsData = useSelector((state) => state.client);
-	console.log(clientsData);
-	
 	// redirect to / if not logged in
 	const userData = useSelector((state) => state.user);
 	console.log(userData);
+
+	const clientsData = useSelector((state) => state.client);
+	console.log(clientsData);
+
+	const clientListData = useSelector((state) => state.clientsList);
+
 	if (!userData.loggedIn) return <Redirect to='/'/>;
 
 	let activeClientsInfo = userData.data.data.data.clients.length;
 	// testing to make sure auth will work across pages
 	const testFN = async () => {
 		const res = await getClientsList(null, auth);
-		//console.log(res);
 	}
 
 	testFN();
@@ -35,7 +37,7 @@ function Home () {
 	return(
 		<div>
 			<ClientOverview activeClients={activeClientsInfo}/>
-			<ClientGrid clientInfo={clientsData}></ClientGrid>
+			<ClientGrid clientList={clientListData.clients.length > 0 ? clientListData.clients : []} clientStats={clientsData}></ClientGrid>
 		</div>
 	);	   
 }
@@ -121,19 +123,18 @@ function ClientRow(props)
 
 function ClientGrid(props)
 {
-	let clientInfo = props.clientInfo;
-	let ids = clientInfo.ids;
-	const names = ['Nicholas Gattuso', 'Essence Peters'];
-	const clientList = ids.map((id, index) =>
+	let clientList= props.clientList;
+	let clientStats = props.clientStats;
+	const clientInfoList = clientList.map(({id, name}, index) =>
 		<div className="individualRow">
-			<ClientRow id={id} name={id} groundingActivations={clientInfo.groundingActivations[index].allTime || 0} symptomReports={clientInfo.symptomReports[index].allTime || 0}></ClientRow>
+			<ClientRow id={id} name={name} groundingActivations={clientStats.groundingActivations[index].allTime || 0} symptomReports={clientStats.symptomReports[index].allTime || 0}></ClientRow>
 		</div>
 		);
 
 	return(
 		<Box>
 			<Grid container spacing={0} className="outer-grid" justifyContent="space-evenly">
-				{clientList}
+				{clientInfoList}
 			</Grid>
 		</Box>
 	);

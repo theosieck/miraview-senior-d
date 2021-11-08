@@ -11,13 +11,16 @@ import './Manage.css';
 function Manage() {
 	// redirect to / if not logged in
 	const userData = useSelector((state) => state.user);
-	console.log(userData);
+
+	const clientListData = useSelector((state) => state.clientsList);
+	let info = clientListData.clients.length > 0 ? clientListData.clients : [];
+
 	if (!userData.loggedIn) return <Redirect to='/'/>;
 
 	return (
 		<div>
 			<hr />
-			<PatientList />
+			<ClientList data={info}/>
 		</div>
 	);
 }
@@ -43,6 +46,7 @@ function stringAvatar(name) {
 }
 
 function Profile (props) {
+	const clientID = props.id;
 	const dropdownRef=useRef(null);
 	const [isActive,setIsActive]=useDetectOutsideClick(dropdownRef,false);
 	const onClick =() => setIsActive(!isActive);
@@ -96,20 +100,21 @@ function Profile (props) {
 	);		
 }
 
-function PatientList() {
+function ClientList(props) {
 	const classes = useStyles();
-	//TODO - Switch names with actual patient info
+	let clientList = props.data;
+	//TODO - Switch names with actualinfo
 	const names = ['Nicholas Gattuso', 'Essence Peters', 'Derek Morris', 'Alex Conetta', 'Gene Donovan', 'Alex Stupar', 'Nicholas Gattuso'];
 	
 	// state hooks
-	const [patients, addPatient] = useState(names);
+	const [clients, addClient] = useState(props.data);
 	const [inputName, setInputName] = useState(null);
-	const [patientFocused, showPatientProfile] = useState(null);
-	const [selectedIndex, setSelectedIndex] = useState(null);
+	const [clientFocused, showClientProfile] = useState(null);
+	const [selectedIndex, setSelectedClient] = useState(null);
 
-	const listPatients = patients.map((name, index) => 
+	const listClients = clients.map(({id, name}, index) => 
 		<List component='div' className={classes.list}>
-			<ListItemButton selected={selectedIndex === index} onClick={() => handlePatientListClick(index)}>
+			<ListItemButton selected={selectedIndex === index} onClick={() => handleClientListClick(id, name)}>
 				<ListItemIcon>
 					<PersonOutlineIcon />
 				</ListItemIcon>
@@ -122,18 +127,18 @@ function PatientList() {
 		</List>
 	);
 	
-	function handlePatientListClick(index) {
-		setSelectedIndex(index);
-		showPatientProfile(<Profile name={patients[index]} />);
+	function handleClientListClick(id, name) {
+		setSelectedClient(id);
+		showClientProfile(<Profile id={id} name={name} />);
 	}
 
-	function handleAddPatientEnterPress(e, inputName) {
+	function handleAddClientEnterPress(e, inputName) {
 		if (e.key === 'Enter') {
-			handleAddPatientClick(inputName);
+			handleAddClientClick(inputName);
 		}
 	}
 
-	function handleAddPatientClick(name) {
+	function handleAddClientClick(name) {
 		// remove all whitespaces from name
 		const testName = name.replace(/\s+/g, '');
 		
@@ -143,7 +148,7 @@ function PatientList() {
 			return;
 		}
 
-		addPatient(patients => [...patients, name]);
+		addClient(clients => [...clients, {id: 0, name: name}]);
 		setInputName('');
 	}
 
@@ -152,15 +157,15 @@ function PatientList() {
 			<Box>
 				<Grid container spacing={0}>
 					<Grid item xs={3}>
-						<div>{listPatients}</div>
+						<div>{listClients}</div>
 						<TextField 	className='addNewPatient' value={inputName} onChange={(e) => setInputName(e.target.value)}
-								onKeyDown={(e) => handleAddPatientEnterPress(e, inputName)} placeholder='Patient Name...' />
-						<Button variant="contained" className='addNewPatient' onClick={() => handleAddPatientClick(inputName)}>
-							+ New Patient
+								onKeyDown={(e) => handleAddClientEnterPress(e, inputName)} placeholder='Client Name...' />
+						<Button variant="contained" className='addNewPatient' onClick={() => handleAddClientClick(inputName)}>
+							+ New Client
 						</Button>
 					</Grid>
 					<Grid item xs={9}>
-						<div>{patientFocused}</div>
+						<div>{clientFocused}</div>
 					</Grid>
 				</Grid>
 			</Box>
