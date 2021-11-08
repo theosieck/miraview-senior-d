@@ -13,59 +13,51 @@ import ArrowRightAlt from '@mui/icons-material/ArrowRightAlt';
 
 import {auth, getClientsList} from '../../firebase/Firebase';
 //import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
-const useStyles = makeStyles({
-	paper: {
-		textAlign: 'center',
-	}
-});
-
-
 
 function Home () {
-	const clientsData = useSelector((state) => state.client);
-	console.log(clientsData);
-	
 	// redirect to / if not logged in
 	const userData = useSelector((state) => state.user);
 	console.log(userData);
+
+	const clientsData = useSelector((state) => state.client);
+	console.log(clientsData);
+
+	const clientListData = useSelector((state) => state.clientsList);
+
 	if (!userData.loggedIn) return <Redirect to='/'/>;
 
+	let activeClientsInfo = userData.data.data.data.clients.length;
 	// testing to make sure auth will work across pages
 	const testFN = async () => {
 		const res = await getClientsList(null, auth);
-		//console.log(res);
 	}
 
 	testFN();
 	
 	return(
 		<div>
-			<ClientOverview/>
-			<ClientGrid></ClientGrid>
+			<ClientOverview activeClients={activeClientsInfo}/>
+			<ClientGrid clientList={clientListData.clients.length > 0 ? clientListData.clients : []} clientStats={clientsData}></ClientGrid>
 		</div>
 	);	   
 }
 
-function ClientOverview()
+function ClientOverview(props)
 {
-	const classes = useStyles();
+	let activeClients = props.activeClients
 	return (
-		<div style={{ width: '70%', padding: '5px'}}>
+		<div style={{ width: '70%', borderBottom: '1px solid gray', marginBottom: "10px"}}>
 			<Box>
-				<Grid container spacing={3}>
+				<Grid container spacing={0}>
 					<Grid item xs={6} sm={3}>
-						<Paper className={classes.paper}>My Clients
-						</Paper>
+						<h4 style={{margin:'10px', padding:'10px', marginRight:'20px', textAlign:"center", borderRight: "1px solid gray"}}>My Clients
+						</h4>
 					</Grid>
 					<Grid item xs={6} sm={3}>
-						<Paper className={classes.paper}>
-							<PlayArrowIcon fontSize="small"></PlayArrowIcon>3 Active Today</Paper>
+						<PlayArrowIcon fontSize="small"></PlayArrowIcon>3 Active Today
 					</Grid>
 					<Grid item xs={6} sm={3}>
-						<Paper className={classes.paper}><PeopleIcon fontSize="small"></PeopleIcon>13 Active Clients</Paper>
-					</Grid>
-					<Grid item xs={6} sm={3}>
-						<Paper className={classes.paper}><ArrowUpwardIcon fontSize="small"></ArrowUpwardIcon>+10% Grounding Activations</Paper>
+						<PeopleIcon fontSize="small"></PeopleIcon>{activeClients} Active Clients
 					</Grid>
 				</Grid>
 			</Box>
@@ -75,9 +67,13 @@ function ClientOverview()
 
 function ClientRow(props)
 {
-	const {
-		name
-	} = props;
+	const info = {
+		clientName: props.name,
+		id: props.id,
+		groundingActivations: props.groundingActivations || 0,
+		symptomReports: props.symptomReports || 0
+	};
+
 	return (
 		<Grid container>
 			<Grid item xs={3}>
@@ -86,7 +82,7 @@ function ClientRow(props)
 						<Avatar/>
 					</Grid>
 					<Grid item xs={9}>
-						<h3 className="name">{name}</h3>
+						<h3 className="name">{info.clientName}</h3>
 						<h4 className="age">Age: 42</h4>
 					</Grid>
 				</Grid>
@@ -97,7 +93,7 @@ function ClientRow(props)
 						<TrendingDownIcon fontSize="large"></TrendingDownIcon>
 					</Grid>
 					<Grid item xs={2}>
-						<h3>-5%</h3>
+						<h3>{info.symptomReports}</h3>
 					</Grid>
 					<Grid item xs={8}>
 						<h4>Symptom Scores</h4>
@@ -111,7 +107,7 @@ function ClientRow(props)
 						<TrendingUpIcon fontSize="large"></TrendingUpIcon>
 					</Grid>
 					<Grid item xs={2}>
-						<h3>+10%</h3>
+						<h3>{info.groundingActivations}</h3>
 					</Grid>
 					<Grid item xs={8}>
 						<h4 style={{marginLeft: '15px'}}>Grounding Activations</h4>
@@ -125,19 +121,20 @@ function ClientRow(props)
 	);
 }
 
-function ClientGrid()
+function ClientGrid(props)
 {
-	const names = ['Nicholas Gattuso', 'Essence Peters', 'Derek Morris', 'Alex Conetta', 'Gene Donovan', 'Alex Stupar', 'Nicholas Gattuso'];
-	const clientList = names.map((name, index) =>
+	let clientList= props.clientList;
+	let clientStats = props.clientStats;
+	const clientInfoList = clientList.map(({id, name}, index) =>
 		<div className="individualRow">
-			<ClientRow name={name}></ClientRow>
+			<ClientRow id={id} name={name} groundingActivations={clientStats.groundingActivations[index] ? clientStats.groundingActivations[index].allTime : 0} symptomReports={clientStats.symptomReports[index] ? clientStats.symptomReports[index].allTime : 0}></ClientRow>
 		</div>
 		);
 
 	return(
 		<Box>
 			<Grid container spacing={0} className="outer-grid" justifyContent="space-evenly">
-				{clientList}
+				{clientInfoList}
 			</Grid>
 		</Box>
 	);

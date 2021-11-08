@@ -1,7 +1,7 @@
 import React, {useState, useRef} from 'react';
 import { useSelector, useDispatch } from "react-redux";
 import { Redirect } from 'react-router-dom';
-import {Box, Grid, Card, Divider, CardHeader, Avatar, Typography, makeStyles} from "@material-ui/core"
+import {Box, Grid, Button, TextField, Card, Divider, CardHeader, Avatar, Typography, makeStyles} from "@material-ui/core"
 import MoreVert from '@material-ui/icons/MoreVert'
 import {useDetectOutsideClick} from "./useDetectOutsideClick";
 import {List, ListItemButton, ListItemIcon, ListItemText} from '@mui/material'
@@ -11,13 +11,16 @@ import './Manage.css';
 function Manage() {
 	// redirect to / if not logged in
 	const userData = useSelector((state) => state.user);
-	console.log(userData);
+
+	const clientListData = useSelector((state) => state.clientsList);
+	let info = clientListData.clients.length > 0 ? clientListData.clients : [];
+
 	if (!userData.loggedIn) return <Redirect to='/'/>;
 
 	return (
 		<div>
 			<hr />
-			<PatientList />
+			<ClientList data={info}/>
 		</div>
 	);
 }
@@ -43,6 +46,7 @@ function stringAvatar(name) {
 }
 
 function Profile (props) {
+	const clientID = props.id;
 	const dropdownRef=useRef(null);
 	const [isActive,setIsActive]=useDetectOutsideClick(dropdownRef,false);
 	const onClick =() => setIsActive(!isActive);
@@ -59,7 +63,7 @@ function Profile (props) {
 							<button onClick={onClick} className="menu-trigger">
 								<MoreVert />
 							</button>
-							<nav ref={dropdownRef} 
+							<div ref={dropdownRef} 
 								className={`menu ${isActive ? "active" : "inactive"}`}>
 								<ul>
 									<li>
@@ -69,7 +73,7 @@ function Profile (props) {
 										Deactive
 									</li>
 								</ul>
-							</nav>
+							</div>
 						</div>
 					</div>
 					
@@ -96,19 +100,21 @@ function Profile (props) {
 	);		
 }
 
-function PatientList() {
+function ClientList(props) {
 	const classes = useStyles();
+	let clientList = props.data;
+	//TODO - Switch names with actualinfo
 	const names = ['Nicholas Gattuso', 'Essence Peters', 'Derek Morris', 'Alex Conetta', 'Gene Donovan', 'Alex Stupar', 'Nicholas Gattuso'];
 	
 	// state hooks
-	const [patients, addPatient] = useState(names);
+	const [clients, addClient] = useState(props.data);
 	const [inputName, setInputName] = useState(null);
-	const [patientFocused, showPatientProfile] = useState(null);
-	const [selectedIndex, setSelectedIndex] = useState(null);
+	const [clientFocused, showClientProfile] = useState(null);
+	const [selectedIndex, setSelectedClient] = useState(null);
 
-	const listPatients = patients.map((name, index) => 
-		<List component='nav' className={classes.list}>
-			<ListItemButton selected={selectedIndex === index} onClick={() => handlePatientListClick(index)}>
+	const listClients = clients.map(({id, name}, index) => 
+		<List component='div' className={classes.list}>
+			<ListItemButton selected={selectedIndex === index} onClick={() => handleClientListClick(id, name)}>
 				<ListItemIcon>
 					<PersonOutlineIcon />
 				</ListItemIcon>
@@ -121,18 +127,18 @@ function PatientList() {
 		</List>
 	);
 	
-	function handlePatientListClick(index) {
-		setSelectedIndex(index);
-		showPatientProfile(<Profile name={patients[index]} />);
+	function handleClientListClick(id, name) {
+		setSelectedClient(id);
+		showClientProfile(<Profile id={id} name={name} />);
 	}
 
-	function handleAddPatientEnterPress(e, inputName) {
+	function handleAddClientEnterPress(e, inputName) {
 		if (e.key === 'Enter') {
-			handleAddPatientClick(inputName);
+			handleAddClientClick(inputName);
 		}
 	}
 
-	function handleAddPatientClick(name) {
+	function handleAddClientClick(name) {
 		// remove all whitespaces from name
 		const testName = name.replace(/\s+/g, '');
 		
@@ -142,7 +148,7 @@ function PatientList() {
 			return;
 		}
 
-		addPatient(patients => [...patients, name]);
+		addClient(clients => [...clients, {id: 0, name: name}]);
 		setInputName('');
 	}
 
@@ -150,16 +156,16 @@ function PatientList() {
 		<div>
 			<Box>
 				<Grid container spacing={0}>
-					<Grid item xs={2}>
-						<p>{listPatients}</p>
-						<input 	class='addNewPatient' value={inputName} onChange={(e) => setInputName(e.target.value)}
-								onKeyDown={(e) => handleAddPatientEnterPress(e, inputName)} placeholder='Patient Name...' />
-						<button class='addNewPatient' onClick={() => handleAddPatientClick(inputName)}>
-							+ New Patient
-						</button>
+					<Grid item xs={3}>
+						<div>{listClients}</div>
+						<TextField 	className='addNewPatient' value={inputName} onChange={(e) => setInputName(e.target.value)}
+								onKeyDown={(e) => handleAddClientEnterPress(e, inputName)} placeholder='Client Name...' />
+						<Button variant="contained" className='addNewPatient' onClick={() => handleAddClientClick(inputName)}>
+							+ New Client
+						</Button>
 					</Grid>
-					<Grid item xs={10}>
-						<div>{patientFocused}</div>
+					<Grid item xs={9}>
+						<div>{clientFocused}</div>
 					</Grid>
 				</Grid>
 			</Box>
