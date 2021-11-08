@@ -5,8 +5,8 @@ import { Button,TextField } from '@mui/material';
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from 'firebase/auth';
 import { auth } from "../firebase/Firebase";
 // import { login} from '../slices/userSlice';
-import { useState } from "react";
-import { getClientsList, getClientStatistics } from "../firebase/Firebase";
+import { useReducer, useState } from "react";
+import { getClientsList, getClientStatistics, getTherapistInfo } from "../firebase/Firebase";
 
 const getDummyData = () => {
 	return {
@@ -116,14 +116,16 @@ export default function Login() {
 		// if successful, pull data from firebase - eddie your stuff goes here
 		//console.log(error);
 		if (!error) {
-			const user = getDummyData();
+			const user = await getTherapistInfo(null,auth);
+			console.log(user)
+			var status=user.data.code;
 
 			// gets from firebase and stores in redux the client statistics
 			storeClientStatistics(dispatch);
 			
 			// if we did not get a user, call signOut() and don't log the user in
 			// eddie you might have to change this conditional depending on what the return for not finding a user is
-			if (!user) {
+			if (status==500) {
 				// sign out of firebase auth
 				await signOut(auth);
 			} else {
@@ -132,7 +134,7 @@ export default function Login() {
 				dispatch({
 					type: 'LOG_IN',
 					payload: {
-						id: user.id,
+						id: auth.currentUser.uid,
 						data: user
 					}
 				});
