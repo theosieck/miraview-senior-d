@@ -17,6 +17,24 @@ const getDummyData = () => {
 	}
 }
 
+const storeClientList = async (dispatch) => {
+	let clients;
+	try {
+		clients = await getClientsList(null, auth);
+		clients = clients.data.data;
+	} catch (e) {
+		console.log(e);
+	}
+
+	// update redux store with client data
+	dispatch({
+		type: 'SET_CLIENT_DATA',
+		payload: {
+			clients: clients		
+		}
+	});
+}
+
 const storeClientStatistics = async (dispatch) => {
 	// pull client statistics data from firebase
 	let clientStatisticsData;
@@ -122,6 +140,9 @@ export default function Login() {
 
 			// gets from firebase and stores in redux the client statistics
 			storeClientStatistics(dispatch);
+
+			// gets clientList data from firebase and stores in redux
+			storeClientList(dispatch);
 			
 			// if we did not get a user, call signOut() and don't log the user in
 			// eddie you might have to change this conditional depending on what the return for not finding a user is
