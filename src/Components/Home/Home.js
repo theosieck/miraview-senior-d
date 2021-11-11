@@ -23,6 +23,10 @@ function Home () {
 	console.log(clientsData);
 
 	const clientListData = useSelector((state) => state.clientsList);
+	console.log(clientListData);
+	let clients;
+	if (clientListData && clientListData.clients) ({clients} = clientListData);
+	else clients = {};
 
 	if (!userData.loggedIn) return <Redirect to='/'/>;
 
@@ -37,7 +41,7 @@ function Home () {
 	return(
 		<div>
 			<ClientOverview activeClients={activeClientsInfo}/>
-			<ClientGrid clientList={clientListData.clients.length > 0 ? clientListData.clients : []} clientStats={clientsData}></ClientGrid>
+			<ClientGrid clientList={clients} clientStats={clientsData}></ClientGrid>
 		</div>
 	);	   
 }
@@ -125,11 +129,24 @@ function ClientGrid(props)
 {
 	let clientList= props.clientList;
 	let clientStats = props.clientStats;
-	const clientInfoList = clientList.map(({id, name}, index) =>
-		<div className="individualRow">
-			<ClientRow id={id} name={name} groundingActivations={clientStats.groundingActivations[index] ? clientStats.groundingActivations[index].allTime : 0} symptomReports={clientStats.symptomReports[index] ? clientStats.symptomReports[index].allTime : 0}></ClientRow>
-		</div>
-		);
+	const clientInfoList = [];
+	const clientIDs = Object.keys(clientList);
+	console.log(clientList);
+	for (let index=0;index<clientIDs.length;index++) {
+		const id = clientIDs[index];
+		const name = clientList[id];
+		clientInfoList.push(
+			<div className="individualRow">
+				<ClientRow id={id} name={name} groundingActivations={clientStats.groundingActivations[index] ? clientStats.groundingActivations[index].allTime : 0} symptomReports={clientStats.symptomReports[index] ? clientStats.symptomReports[index].allTime : 0}></ClientRow>
+			</div>
+		)
+	}
+	console.log(clientInfoList);
+	// const clientInfoList = clientList.map(({id, name}, index) =>
+	// 	<div className="individualRow">
+	// 		<ClientRow id={id} name={name} groundingActivations={clientStats.groundingActivations[index] ? clientStats.groundingActivations[index].allTime : 0} symptomReports={clientStats.symptomReports[index] ? clientStats.symptomReports[index].allTime : 0}></ClientRow>
+	// 	</div>
+	// 	);
 
 	return(
 		<Box>
