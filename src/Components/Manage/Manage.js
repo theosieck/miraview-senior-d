@@ -13,7 +13,9 @@ function Manage() {
 	const userData = useSelector((state) => state.user);
 
 	const clientListData = useSelector((state) => state.clientsList);
-	let info = clientListData.clients.length > 0 ? clientListData.clients : [];
+	let info;
+	if (clientListData && clientListData.clients) info = clientListData.clients;
+	else info = {};
 
 	if (!userData.loggedIn) return <Redirect to='/'/>;
 
@@ -112,20 +114,41 @@ function ClientList(props) {
 	const [clientFocused, showClientProfile] = useState(null);
 	const [selectedIndex, setSelectedClient] = useState(null);
 
-	const listClients = clients.map(({id, name}, index) => 
-		<List component='div' className={classes.list}>
-			<ListItemButton selected={selectedIndex === index} onClick={() => handleClientListClick(id, name)}>
-				<ListItemIcon>
-					<PersonOutlineIcon />
-				</ListItemIcon>
-				<ListItemText disableTypography primary={
-					<Typography variant='h5'>
-						{name}
-					</Typography>
-				}/>
-			</ListItemButton>
-		</List>
-	);
+	const listClients = [];
+	const clientIDs = Object.keys(clients);
+	for (let index=0;index<clientIDs.length;index++) {
+		const id = clientIDs[index];
+		const name = clients[id];
+		listClients.push(
+			<List component='div' className={classes.list}>
+				<ListItemButton selected={selectedIndex === index} onClick={() => handleClientListClick(id, name)}>
+					<ListItemIcon>
+						<PersonOutlineIcon />
+					</ListItemIcon>
+					<ListItemText disableTypography primary={
+						<Typography variant='h5'>
+							{name}
+						</Typography>
+					}/>
+				</ListItemButton>
+			</List>
+		);
+	}
+	console.log(listClients);
+	// const listClients = clients.map(({id, name}, index) => 
+	// 	<List component='div' className={classes.list}>
+	// 		<ListItemButton selected={selectedIndex === index} onClick={() => handleClientListClick(id, name)}>
+	// 			<ListItemIcon>
+	// 				<PersonOutlineIcon />
+	// 			</ListItemIcon>
+	// 			<ListItemText disableTypography primary={
+	// 				<Typography variant='h5'>
+	// 					{name}
+	// 				</Typography>
+	// 			}/>
+	// 		</ListItemButton>
+	// 	</List>
+	// );
 	
 	function handleClientListClick(id, name) {
 		setSelectedClient(id);
@@ -158,11 +181,11 @@ function ClientList(props) {
 				<Grid container spacing={0}>
 					<Grid item xs={3}>
 						<div>{listClients}</div>
-						<TextField 	className='addNewPatient' value={inputName} onChange={(e) => setInputName(e.target.value)}
+						{/* <TextField 	className='addNewPatient' value={inputName} onChange={(e) => setInputName(e.target.value)}
 								onKeyDown={(e) => handleAddClientEnterPress(e, inputName)} placeholder='Client Name...' />
 						<Button variant="contained" className='addNewPatient' onClick={() => handleAddClientClick(inputName)}>
 							+ New Client
-						</Button>
+						</Button> */}
 					</Grid>
 					<Grid item xs={9}>
 						<div>{clientFocused}</div>
