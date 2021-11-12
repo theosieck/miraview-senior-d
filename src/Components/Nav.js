@@ -61,7 +61,15 @@ function Nav(props) {
         // send dispatch to clear client statistics in redux
         dispatch({
             type: 'CLEAR_CLIENT_STATISTICS_DATA'
-        })
+        });
+        // send dispatch to clear client list in redux
+        dispatch({
+            type: 'CLEAR_CLIENT_DATA'
+        });
+        // send dispatch to clear single client data in redux
+        dispatch({
+            type: 'CLEAR_SINGLE_CLIENT_DATA'
+        });
     }
 
     return <nav>

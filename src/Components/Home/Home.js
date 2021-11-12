@@ -19,8 +19,8 @@ function Home () {
 	const userData = useSelector((state) => state.user);
 	console.log(userData);
 
-	const clientsData = useSelector((state) => state.client);
-	console.log(clientsData);
+	const clientsStatisticsData = useSelector((state) => state.clientStatistics);
+	console.log(clientsStatisticsData);
 
 	const clientListData = useSelector((state) => state.clientsList);
 	console.log(clientListData);
@@ -41,7 +41,7 @@ function Home () {
 	return(
 		<div>
 			<ClientOverview activeClients={activeClientsInfo}/>
-			<ClientGrid clientList={clients} clientStats={clientsData}></ClientGrid>
+			<ClientGrid clientList={clients} clientStats={clientsStatisticsData}></ClientGrid>
 		</div>
 	);	   
 }

@@ -4,9 +4,8 @@ import { Redirect } from 'react-router-dom';
 import { Button,TextField } from '@mui/material';
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from 'firebase/auth';
 import { auth } from "../firebase/Firebase";
-// import { login} from '../slices/userSlice';
 import { useReducer, useState } from "react";
-import { getClientsList, getClientStatistics, getTherapistInfo } from "../firebase/Firebase";
+import { getClientsList, getClientStatistics, getTherapistInfo, getSingleClient } from "../firebase/Firebase";
 
 const getDummyData = () => {
 	return {
@@ -72,8 +71,12 @@ export default function Login() {
 	// console.log(auth);
 
 	// clientReducer
-	const clientsData = useSelector((state) => state.client);
+	const clientsData = useSelector((state) => state.clientStatistics);
 	console.log(clientsData);
+
+	// singleClientReducer
+	const singleClientData = useSelector((state) => state.singleClient);
+	console.log(singleClientData);
 
 	// TESTING ONLY
 	const createUser = async () => {
@@ -143,7 +146,7 @@ export default function Login() {
 
 			// gets clientList data from firebase and stores in redux
 			storeClientList(dispatch);
-			
+
 			// if we did not get a user, call signOut() and don't log the user in
 			// eddie you might have to change this conditional depending on what the return for not finding a user is
 			if (status==500) {
@@ -176,7 +179,8 @@ export default function Login() {
 				<Button type='submit'>Login</Button>
 			</form>
 
-			<p>Test user info: email: testing@test.test, password: 1234test</p>
+			<p>Test therapist 1 info: email: testing@test.test, password: 1234test</p>
+			<p>Test therapist 2 info: email: test123@testing.test, password: test1234</p>
 		</>
 	)
 }
