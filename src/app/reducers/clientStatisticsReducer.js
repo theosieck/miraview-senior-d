@@ -4,13 +4,13 @@ const initalState = {
 	symptomReports: [null]
 };
   
-const clientReducer = (state = initalState, action) => {
+const clientStatisticsReducer = (state = initalState, action) => {
 	//console.log(action);
 	const { type, payload } = action;
 
 	switch (type) {
 		case 'SET_CLIENT_STATISTICS_DATA':
-			console.log('payload', payload);
+			//console.log('payload', payload);
 			return {
 				ids: payload.ids,
 				groundingActivations: payload.groundingActivations,
@@ -28,4 +28,4 @@ const clientReducer = (state = initalState, action) => {
 	}
 };
 
-export default clientReducer;
+export default clientStatisticsReducer;

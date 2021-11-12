@@ -1,5 +1,7 @@
 import React, {useState, useRef} from 'react';
 import { useSelector, useDispatch } from "react-redux";
+import { auth } from "../../firebase/Firebase";
+import { getSingleClient } from "../../firebase/Firebase";
 import { Redirect } from 'react-router-dom';
 import {Box, Grid, Button, TextField, Card, Divider, CardHeader, Avatar, Typography, makeStyles} from "@material-ui/core"
 import MoreVert from '@material-ui/icons/MoreVert'
@@ -47,11 +49,33 @@ function stringAvatar(name) {
 	};
 }
 
+const storeSingleClient = async (dispatch, clientID) => {
+	let singleClient;
+	try {
+		singleClient = await getSingleClient({id: clientID}, auth);
+		singleClient = singleClient.data.data;
+		console.log(singleClient);
+	} catch (e) {
+		console.log(e);
+	}
+
+	dispatch({
+		type: 'SET_SINGLE_CLIENT_DATA',
+		payload: {
+			id: clientID,
+			data: singleClient
+		}
+	});
+}
+
 function Profile (props) {
 	const clientID = props.id;
 	const dropdownRef=useRef(null);
 	const [isActive,setIsActive]=useDetectOutsideClick(dropdownRef,false);
 	const onClick =() => setIsActive(!isActive);
+
+	// when a name in list is clicked, get that client's data and store it in redux
+	storeSingleClient(useDispatch(), clientID);
 	
 	return (
 		<Card>

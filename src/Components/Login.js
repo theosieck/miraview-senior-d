@@ -6,7 +6,6 @@ import { signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } f
 import { auth } from "../firebase/Firebase";
 import { useReducer, useState } from "react";
 import { getClientsList, getClientStatistics, getTherapistInfo, getSingleClient } from "../firebase/Firebase";
-import singleClientReducer from "../app/reducers/singleClientReducer";
 
 const getDummyData = () => {
 	return {
@@ -33,16 +32,6 @@ const storeClientList = async (dispatch) => {
 			clients: clients		
 		}
 	});
-}
-
-const storeSingleClient = async (dispatch) => {
-	let singleClient;
-	try {
-		singleClient = await getSingleClient(null, auth, '0dn3LeedhGYRnJHLcJ3PFTIWg092');
-		console.log(singleClient.data);
-	} catch (e) {
-		console.log(e);
-	}
 }
 
 const storeClientStatistics = async (dispatch) => {
@@ -82,7 +71,7 @@ export default function Login() {
 	// console.log(auth);
 
 	// clientReducer
-	const clientsData = useSelector((state) => state.client);
+	const clientsData = useSelector((state) => state.clientStatistics);
 	console.log(clientsData);
 
 	// singleClientReducer
@@ -158,9 +147,6 @@ export default function Login() {
 			// gets clientList data from firebase and stores in redux
 			storeClientList(dispatch);
 
-			// gets singleClient data from firebase and stores in redux
-			storeSingleClient(dispatch);
-
 			// if we did not get a user, call signOut() and don't log the user in
 			// eddie you might have to change this conditional depending on what the return for not finding a user is
 			if (status==500) {
@@ -193,7 +179,8 @@ export default function Login() {
 				<Button type='submit'>Login</Button>
 			</form>
 
-			<p>Test user info: email: testing@test.test, password: 1234test</p>
+			<p>Test therapist 1 info: email: testing@test.test, password: 1234test</p>
+			<p>Test therapist 2 info: email: test123@testing.test, password: test1234</p>
 		</>
 	)
 }
