@@ -4,9 +4,9 @@ import { Redirect } from 'react-router-dom';
 import { Button,TextField } from '@mui/material';
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from 'firebase/auth';
 import { auth } from "../firebase/Firebase";
-// import { login} from '../slices/userSlice';
 import { useReducer, useState } from "react";
-import { getClientsList, getClientStatistics, getTherapistInfo } from "../firebase/Firebase";
+import { getClientsList, getClientStatistics, getTherapistInfo, getSingleClient } from "../firebase/Firebase";
+import singleClientReducer from "../app/reducers/singleClientReducer";
 
 const getDummyData = () => {
 	return {
@@ -33,6 +33,16 @@ const storeClientList = async (dispatch) => {
 			clients: clients		
 		}
 	});
+}
+
+const storeSingleClient = async (dispatch) => {
+	let singleClient;
+	try {
+		singleClient = await getSingleClient(null, auth, '0dn3LeedhGYRnJHLcJ3PFTIWg092');
+		console.log(singleClient.data);
+	} catch (e) {
+		console.log(e);
+	}
 }
 
 const storeClientStatistics = async (dispatch) => {
@@ -74,6 +84,10 @@ export default function Login() {
 	// clientReducer
 	const clientsData = useSelector((state) => state.client);
 	console.log(clientsData);
+
+	// singleClientReducer
+	const singleClientData = useSelector((state) => state.singleClient);
+	console.log(singleClientData);
 
 	// TESTING ONLY
 	const createUser = async () => {
@@ -143,7 +157,10 @@ export default function Login() {
 
 			// gets clientList data from firebase and stores in redux
 			storeClientList(dispatch);
-			
+
+			// gets singleClient data from firebase and stores in redux
+			storeSingleClient(dispatch);
+
 			// if we did not get a user, call signOut() and don't log the user in
 			// eddie you might have to change this conditional depending on what the return for not finding a user is
 			if (status==500) {
