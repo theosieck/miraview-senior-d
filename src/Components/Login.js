@@ -70,6 +70,9 @@ export default function Login() {
 	let error;
 	// console.log(auth);
 
+	//error message
+	const [errorMessage,setErrorMessage]=useState('');
+
 	// clientReducer
 	const clientsData = useSelector((state) => state.clientStatistics);
 	console.log(clientsData);
@@ -115,6 +118,8 @@ export default function Login() {
 		} catch (err) {
 			error = err;
 			console.log(err);
+			setErrorMessage("Incorrect Username or Password!");
+			{errorMessage && <div>{errorMessage}</div>}
 			alert(err);
 			// handle error - TODO
 			/** errors look like this
