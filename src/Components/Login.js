@@ -7,6 +7,7 @@ import { auth } from "../firebase/Firebase";
 // import { login} from '../slices/userSlice';
 import { useReducer, useState } from "react";
 import { getClientsList, getClientStatistics, getTherapistInfo } from "../firebase/Firebase";
+import Alert from '@material-ui/lab/Alert';
 
 const getDummyData = () => {
 	return {
@@ -72,7 +73,7 @@ export default function Login() {
 	// console.log(auth);
 
 	//error message
-	const [errorMessage,setErrorMessage]=useState('');
+	const [login,setLogin]=useState(false);
 
 	// clientReducer
 	const clientsData = useSelector((state) => state.client);
@@ -96,7 +97,6 @@ export default function Login() {
 		e.preventDefault();
 		// reset error
 		error = null;
-
 		// get inputs
 		const email = document.getElementById('email').value;
 		const password = document.getElementById('password').value;
@@ -115,9 +115,7 @@ export default function Login() {
 		} catch (err) {
 			error = err;
 			console.log(err);
-			setErrorMessage("Incorrect Username or Password!");
-			{errorMessage && <div>{errorMessage}</div>}
-			alert(err);
+			setLogin(true);
 			// handle error - TODO
 			/** errors look like this
 			 * {
@@ -167,9 +165,10 @@ export default function Login() {
 			}
 		}
 	}
-
 	// if user is logged in redirect to homepage
 	if (userData && userData.loggedIn) return <Redirect to='/home'/>;
+
+	
 
 	return (
 		<>
@@ -180,8 +179,10 @@ export default function Login() {
 				<TextField id='password' label='Password' variant='outlined' type='password' />
 				<Button type='submit'>Login</Button>
 			</form>
-
+			{login && <Alert severity="error">Your login credentials could not be verified, please try again.</Alert>}
 			<p>Test user info: email: testing@test.test, password: 1234test</p>
 		</>
 	)
+	
+
 }
