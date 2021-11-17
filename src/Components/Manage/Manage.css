@@ -97,3 +97,18 @@ hr
     display: block;
 }
   
+#search-for-client, #client-found {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    max-width: 350px;
+    margin-left: 10px;
+}
+
+#search-for-client {
+    margin-top: 10px;
+}
+
+#client-found-name {
+    font-weight: bold;
+}
