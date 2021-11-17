@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { findClient, auth } from "../../firebase/Firebase";
+import { findClient, updateTherapist, auth } from "../../firebase/Firebase";
 import { Button, TextField } from '@mui/material';
 
 export default function FindClient () {
@@ -33,7 +33,21 @@ export default function FindClient () {
 		e.preventDefault();
 
 		console.log('adding client to therapist');
-		//TODO
+		
+		// get the client id from clientFound
+		const clientID = clientFound.uid;
+
+		// update the therapist to add the new id
+		let result;
+		try {
+			result = await updateTherapist({clients:[clientID]});
+			if (result.data.code!==200) throw 'Error: something went wrong updating the therapist';
+		} catch (e) {
+			console.log(e);
+			//TODO
+		}
+
+		// add client to redux store - TODO
 	}
 
 	return (
