@@ -138,7 +138,8 @@ function ClientGrid(props)
 		const name = clientList[id];
 		const stat = clientStats.idObjects[id];
 		console.log(stat);
-		console.log(stat.groundingActivations);
+		//console.log(stat.email)
+		//console.log(stat.groundingActivations);
 		//console.log(stat.symptomReports)
 		// clientInfoList.push(
 		// 	<div className="individualRow">
