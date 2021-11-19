@@ -12,6 +12,8 @@ export default function FindClient () {
 		let email = document.getElementById('client-email').value;
 		email = email.trim();
 
+		// TODO make sure client isn't already a client of this therapist
+
 		// look for the client
 		let result;
 		try {
@@ -40,7 +42,7 @@ export default function FindClient () {
 		// update the therapist to add the new id
 		let result;
 		try {
-			result = await updateTherapist({clients:[clientID]});
+			result = await updateTherapist({clients:[clientID]}, auth);
 			if (result.data.code!==200) throw 'Error: something went wrong updating the therapist';
 		} catch (e) {
 			console.log(e);
@@ -49,7 +51,7 @@ export default function FindClient () {
 
 		// add client to redux store - TODO
 	}
-
+	
 	return (
 		<>
 			<form onSubmit={searchForClient} id="search-for-client">
