@@ -1,5 +1,5 @@
 const initalState = {
-	ids: [null],
+	emails: null,
 	groundingActivations: [null],
 	symptomReports: [null]
 };
@@ -12,13 +12,13 @@ const clientStatisticsReducer = (state = initalState, action) => {
 		case 'SET_CLIENT_STATISTICS_DATA':
 			//console.log('payload', payload);
 			return {
-				ids: payload.ids,
+				emails: payload.emails,
 				groundingActivations: payload.groundingActivations,
 				symptomReports: payload.symptomReports
 			};
 		case 'CLEAR_CLIENT_STATISTICS_DATA':
 			return {
-				ids: [null],
+				emails: null,
 				groundingActivations: [null],
 				symptomReports: [null]
 			};
