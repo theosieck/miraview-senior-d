@@ -41,7 +41,6 @@ const storeClientStatistics = async (dispatch) => {
 	try {
 		let clientStatistics = await getClientStatistics(null, auth);
 		console.log('--Client Statistics Data Here--');
-		//console.log(clientStatistics);
 		// .data gives {code:..., data:...} so do .data.data
 		clientStatisticsData = clientStatistics.data.data;
 		//console.log(clientStatisticsData);
@@ -49,14 +48,21 @@ const storeClientStatistics = async (dispatch) => {
 		console.log(e);
 		alert(e);
 	}
+	
+	let clientEmails = [], clientGroundingActivations = [], clientSymptomReports = [];
+	for (let key in clientStatisticsData) {
+		clientEmails.push(clientStatisticsData[key].email);
+		clientGroundingActivations.push(clientStatisticsData[key].groundingActivations);
+		clientSymptomReports.push(clientStatisticsData[key].symptomReports);
+	}
 
 	// update redux store with client statistics data
 	dispatch({
 		type: 'SET_CLIENT_STATISTICS_DATA',
 		payload: {
-			ids: 					clientStatisticsData.map(function(x) {return x.id}),
-			groundingActivations: 	clientStatisticsData.map(function(x) {return x.groundingActivations}),
-			symptomReports: 		clientStatisticsData.map(function(x) {return x.symptomReports})
+			emails: 				clientEmails,
+			groundingActivations: 	clientGroundingActivations,
+			symptomReports: 		clientSymptomReports
 		}
 	})
 }

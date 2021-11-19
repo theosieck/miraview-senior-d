@@ -9,6 +9,7 @@ import {useDetectOutsideClick} from "./useDetectOutsideClick";
 import {List, ListItemButton, ListItemIcon, ListItemText} from '@mui/material'
 import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
 import './Manage.css';
+import FindClient from './FindClient';
 
 function Manage() {
 	// redirect to / if not logged in
@@ -25,6 +26,7 @@ function Manage() {
 		<div>
 			<hr />
 			<ClientList data={info}/>
+			<FindClient />
 		</div>
 	);
 }
