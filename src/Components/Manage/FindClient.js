@@ -1,12 +1,16 @@
 import { useState } from "react";
 import { findClient, updateTherapist, auth } from "../../firebase/Firebase";
-import { Button, TextField } from '@mui/material';
+import { Button, TextField, CircularProgress } from '@mui/material';
 
 export default function FindClient () {
 	const [clientFound, setClientFound] = useState(null);
+	const [loading, setLoading] = useState(false);
 
 	const searchForClient = async (e) => {
 		e.preventDefault();
+
+		// set loading
+		setLoading(true);
 
 		// get the email we're looking for
 		let email = document.getElementById('client-email').value;
@@ -29,6 +33,9 @@ export default function FindClient () {
 
 		// clear the input
 		document.getElementById('client-email').value = '';
+
+		// unset loading
+		setLoading(false);
 	}
 
 	const addClient = async (e) => {
@@ -38,6 +45,9 @@ export default function FindClient () {
 		
 		// get the client id from clientFound
 		const clientID = clientFound.uid;
+		console.log(clientFound);
+		setClientFound(false);
+		setLoading(true);
 
 		// update the therapist to add the new id
 		let result;
@@ -50,20 +60,24 @@ export default function FindClient () {
 		}
 
 		// add client to redux store - TODO
+
+		setLoading(false);
 	}
 	
 	return (
-		<>
+		<div id="find-client">
 			<form onSubmit={searchForClient} id="search-for-client">
 				<label htmlFor="client-email" style={{display:"none"}}>Find Client</label>
 				<TextField id="client-email" type="email" />
 				<Button type="submit" variant="contained">Search</Button>
 			</form>
 
+			{loading && <CircularProgress id="find-client-loading" />}
+
 			{clientFound && <div id="client-found">
 				<p>Found client <span id="client-found-name">{clientFound.name}</span></p>
 				<Button onClick={addClient} variant="contained">Add</Button>
 			</div>}
-		</>
+		</div>
 	)
 }

@@ -96,13 +96,16 @@ hr
     padding: 15px 20px;
     display: block;
 }
-  
+
+#find-client {
+    max-width: 350px;
+    margin-left: 10px;
+}
+
 #search-for-client, #client-found {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    max-width: 350px;
-    margin-left: 10px;
 }
 
 #search-for-client {
@@ -111,4 +114,9 @@ hr
 
 #client-found-name {
     font-weight: bold;
+}
+
+#find-client-loading {
+    margin-left: 102px;
+    margin-top: 10px;
 }
