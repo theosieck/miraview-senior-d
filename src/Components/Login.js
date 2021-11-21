@@ -105,8 +105,14 @@ export default function Login() {
 		// make sure email and password exist and are nonempty strings
 		try {
 			if (!email) throw Error('Please enter an email.');
+			if (!password) throw Error('Please enter a password.');
 			if (typeof email!=='string') throw Error('Email must be a string.');
-			
+			if (typeof password!=='string') throw Error('Password must be a string.');
+			email = email.trim();
+			if (email==='') throw Error('Email must contain at least one character.');
+		} catch (e) {
+			error = e.toString();
+			return;
 		}
 
 		// send auth to firebase
