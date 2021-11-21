@@ -80,8 +80,7 @@ export default function FindClient () {
 			type: 'SET_CLIENT_DATA',
 			payload: clientListData
 		});
-		console.log(clientListData);
-
+		
 		setLoading(false);
 	}
 	

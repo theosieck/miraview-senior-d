@@ -10,34 +10,27 @@ import TrendingDownIcon from '@mui/icons-material/TrendingDown';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import Button from '@mui/material/Button';
 import ArrowRightAlt from '@mui/icons-material/ArrowRightAlt';
-
-import {auth, getClientsList} from '../../firebase/Firebase';
-//import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
+import {auth} from '../../firebase/Firebase';
+import { storeClientList, storeClientStatistics } from '../../firebase/fetchData';
 
 function Home () {
-	// redirect to / if not logged in
+	// pull data from redux store
 	const userData = useSelector((state) => state.user);
-	console.log(userData);
-
 	const clientsStatisticsData = useSelector((state) => state.clientStatistics);
-	console.log(clientsStatisticsData);
-
 	const clientListData = useSelector((state) => state.clientsList);
-	console.log(clientListData);
 	let clients;
 	if (clientListData && clientListData.clients) ({clients} = clientListData);
 	else clients = {};
+	let activeClientsInfo = userData.data.data.data.clients.length;
+	
+	const dispatch = useDispatch();
+	// refetch data from firebase and store in redux
+	storeClientList(dispatch);
+	storeClientStatistics(dispatch);
 
+	// redirect to / if not logged in
 	if (!userData.data || !auth.currentUser) return <Redirect to='/'/>;
 
-	let activeClientsInfo = userData.data.data.data.clients.length;
-	// testing to make sure auth will work across pages
-	const testFN = async () => {
-		const res = await getClientsList(null, auth);
-	}
-
-	testFN();
-	
 	return(
 		<div>
 			<ClientOverview activeClients={activeClientsInfo}/>

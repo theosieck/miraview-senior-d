@@ -10,16 +10,20 @@ import {List, ListItemButton, ListItemIcon, ListItemText} from '@mui/material'
 import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
 import './Manage.css';
 import FindClient from './FindClient';
+import { storeClientList } from '../../firebase/fetchData';
 
 function Manage() {
-	// redirect to / if not logged in
 	const userData = useSelector((state) => state.user);
-
 	const clientListData = useSelector((state) => state.clientsList);
 	let info;
 	if (clientListData && clientListData.clients) info = clientListData.clients;
 	else info = {};
 
+	const dispatch = useDispatch();
+	// refetch data from firebase
+	storeClientList(dispatch);
+
+	// redirect to / if not logged in
 	if (!userData.data || !auth.currentUser) return <Redirect to='/'/>;
 
 	return (
