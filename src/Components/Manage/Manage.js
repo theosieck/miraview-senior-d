@@ -24,13 +24,13 @@ function Manage() {
 	storeClientList(dispatch);
 
 	// redirect to / if not logged in
-	if (!userData.data || !auth.currentUser) return <Redirect to='/'/>;
+	if (!userData.data) return <Redirect to='/'/>;
 
 	return (
 		<div>
 			<hr />
 			<ClientList data={info}/>
-			<FindClient />
+			{/* <FindClient /> */}
 		</div>
 	);
 }
@@ -222,6 +222,7 @@ function ClientList(props) {
 					</Grid>
 				</Grid>
 			</Box>
+			<FindClient handleClientListClick={handleClientListClick} />
 		</div>
 	);
 }

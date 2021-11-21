@@ -29,7 +29,7 @@ function Home () {
 	storeClientStatistics(dispatch);
 
 	// redirect to / if not logged in
-	if (!userData.data || !auth.currentUser) return <Redirect to='/'/>;
+	if (!userData.data) return <Redirect to='/'/>;
 
 	return(
 		<div>

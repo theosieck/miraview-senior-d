@@ -4,7 +4,7 @@ import { Button, TextField, CircularProgress } from '@mui/material';
 import { useSelector, useDispatch } from "react-redux";
 import Alert from '@material-ui/lab/Alert';
 
-export default function FindClient () {
+export default function FindClient (props) {
 	const userData = useSelector((state) => state.user);
 	const dispatch = useDispatch();
 	const clientListData = useSelector((state) => state.clientsList);
@@ -80,6 +80,9 @@ export default function FindClient () {
 			type: 'SET_CLIENT_DATA',
 			payload: clientListData
 		});
+
+		// focus on the new client
+		props.handleClientListClick(clientID,clientFound.name);
 		
 		setLoading(false);
 	}
