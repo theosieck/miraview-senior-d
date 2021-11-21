@@ -18,20 +18,18 @@ function Home () {
 	const userData = useSelector((state) => state.user);
 	const clientsStatisticsData = useSelector((state) => state.clientStatistics);
 	const clientListData = useSelector((state) => state.clientsList);
-	let clients;
-	if (clientListData && clientListData.clients) ({clients} = clientListData);
-	else clients = {};
-	let activeClientsInfo = userData.data.data.data.clients.length;
-	
 	const dispatch = useDispatch();
 	// refetch data from firebase and store in redux
 	useEffect(() => {
 		storeClientList(dispatch);
 		storeClientStatistics(dispatch);
 	}, []);
-	
 	// redirect to / if not logged in
 	if (!userData.data) return <Redirect to='/'/>;
+	let clients;
+	if (clientListData && clientListData.clients) ({clients} = clientListData);
+	else clients = {};
+	let activeClientsInfo = userData.data.data.data.clients.length;
 
 	return(
 		<div>

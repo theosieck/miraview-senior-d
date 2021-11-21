@@ -10,7 +10,6 @@ import {List, ListItemButton, ListItemIcon, ListItemText} from '@mui/material'
 import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
 import './Manage.css';
 import FindClient from './FindClient';
-import { storeClientList } from '../../firebase/fetchData';
 
 function Manage() {
 	const userData = useSelector((state) => state.user);
@@ -18,10 +17,6 @@ function Manage() {
 	let info;
 	if (clientListData && clientListData.clients) info = clientListData.clients;
 	else info = {};
-
-	const dispatch = useDispatch();
-	// refetch data from firebase
-	useEffect(() => {storeClientList(dispatch)}, []);
 
 	// redirect to / if not logged in
 	if (!userData.data) return <Redirect to='/'/>;
