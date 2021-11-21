@@ -79,8 +79,11 @@ const storeSingleClient = async (dispatch, clientID) => {
 
 function Profile (props) {
 	const clientID = props.id;
+	/*
 	const dropdownRef=useRef(null);
-	const [isActive,setIsActive]=useDetectOutsideClick(dropdownRef,false);
+	//const [isActive,setIsActive]=useDetectOutsideClick(dropdownRef,false);
+	*/
+	const[isActive,setIsActive]=useState(false);
 	const onClick =() => setIsActive(!isActive);
 	
 	const [open, setOpen] = useState(false);
@@ -93,7 +96,7 @@ function Profile (props) {
 
 	const handleClose = () => {
 		setOpen(false);
-		setIsActive(!isActive);
+		//setIsActive(!isActive);
 	};
 
 	const handleChange = e => {
@@ -108,7 +111,7 @@ function Profile (props) {
 	const editUserInfo = async () => {
 		try {
 			setOpen(false);
-			setIsActive(!isActive);
+			//setIsActive(!isActive);
 			const edit=await editClientInfo(data,auth);
 			console.log(edit);
 		} catch (e) {
@@ -137,10 +140,9 @@ function Profile (props) {
 							<button onClick={onClick} className="menu-trigger">
 								<MoreVert />
 							</button>
-							<div ref={dropdownRef} 
-								className={`menu ${isActive ? "active" : "inactive"}`}>
+							<div className={`menu ${isActive ? "active" : "inactive"}`}>
 								<ul>
-									<li ref={dropdownRef}>
+									<li>
 										<Button variant="outlined" onClick={handleClickOpen}>
 											Edit Client Information
 										</Button>
