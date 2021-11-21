@@ -28,6 +28,7 @@ const getClientStatistics = httpsCallable(firebaseFunctions, 'getClientStatistic
 const getSingleClient = httpsCallable(firebaseFunctions, 'getSingleClient');
 const updateTherapist = httpsCallable(firebaseFunctions, 'updateTherapist');
 const getTherapistInfo=httpsCallable(firebaseFunctions,'getTherapistInfo')
+const editClientInfo=httpsCallable(firebaseFunctions,'editClientInfo');
 
 /* Call functions like this:
 import {getClientsList} from Firebase.js;
@@ -50,4 +51,4 @@ getClientsList().then((result) => {
 
 export default firebaseApp;
 export {auth};
-export { addTherapist, getClientsList, getClientStatistics, getSingleClient, updateTherapist,getTherapistInfo };
+export { addTherapist, getClientsList, getClientStatistics, getSingleClient, updateTherapist,getTherapistInfo,editClientInfo };

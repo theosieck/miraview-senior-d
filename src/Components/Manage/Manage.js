@@ -8,7 +8,14 @@ import MoreVert from '@material-ui/icons/MoreVert'
 import {useDetectOutsideClick} from "./useDetectOutsideClick";
 import {List, ListItemButton, ListItemIcon, ListItemText} from '@mui/material'
 import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
+import Popover from '@mui/material/Popover'; 
 import './Manage.css';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
+import {editClientInfo} from "../../firebase/Firebase";
 
 function Manage() {
 	// redirect to / if not logged in
@@ -73,9 +80,47 @@ function Profile (props) {
 	const dropdownRef=useRef(null);
 	const [isActive,setIsActive]=useDetectOutsideClick(dropdownRef,false);
 	const onClick =() => setIsActive(!isActive);
+	
+	const [open, setOpen] = useState(false);
+
+	const [data,setData]=useState({uid:clientID,lastname:'',gender:'',sex:'',secondaryemail:'',phonenumber:'',phonetype:''})
+
+	const handleClickOpen = () => {
+		setOpen(true);
+	};
+
+	const handleClose = () => {
+		setOpen(false);
+		setIsActive(!isActive);
+	};
+
+	const handleChange = e => {
+		const { name, value } = e.target;
+		setData(prevState => ({
+			...prevState,
+			[name]: value
+		}));
+	};
+
+	//calls the API to updat the user info 
+	const editUserInfo = async () => {
+		try {
+			setOpen(false);
+			setIsActive(!isActive);
+			await editClientInfo(data,auth);
+		} catch (e) {
+			console.log(e);
+		}
+	};
+
+	
+
+
 
 	// when a name in list is clicked, get that client's data and store it in redux
 	storeSingleClient(useDispatch(), clientID);
+
+
 	
 	return (
 		<Card>
@@ -92,9 +137,90 @@ function Profile (props) {
 							<div ref={dropdownRef} 
 								className={`menu ${isActive ? "active" : "inactive"}`}>
 								<ul>
-									<li>
-										Edit
+									<li ref={dropdownRef}>
+										<Button variant="outlined" onClick={handleClickOpen}>
+											Edit Client Information
+										</Button>
+										<Dialog open={open} onClose={handleClose}>
+											<DialogTitle>Edit Client Information</DialogTitle>
+											<DialogContent>
+												<TextField
+													autofocus
+													margin="dense"
+													id="name"
+													label="Last Name"
+													name='lastname'
+													fullWidth
+													variant="standard"
+													value={data.lastname}
+													onChange={handleChange}
+													InputLabelProps={{ shrink: true }}
+												/>
+												<TextField
+													name='gender'
+													margin="dense"
+													id="gender"
+													label="Gender"
+													fullWidth
+													variant="standard"
+													value={data.gender}
+													onChange={handleChange}
+													InputLabelProps={{ shrink: true }}
+												/>
+												<TextField
+													name='sex'
+													margin="dense"
+													id="sex"
+													label="Sex"
+													fullWidth
+													variant="standard"
+													value={data.sex}
+													onChange={handleChange}
+													InputLabelProps={{ shrink: true }}
+												/>
+												<TextField
+													name='secondaryemail'
+													margin="dense"
+													id="email"
+													label="Secondary Email Address"
+													type="email"
+													fullWidth
+													variant="standard"
+													value={data.secondaryemail}
+													onChange={handleChange}
+													InputLabelProps={{ shrink: true }}
+												/>
+												<TextField
+													name='phonenumber'
+													margin="dense"
+													id="number"
+													label="Phone Number"
+													fullWidth
+													variant="standard"
+													value={data.phonenumber}
+													onChange={handleChange}
+													InputLabelProps={{ shrink: true }}
+												/>
+												<TextField
+													name='phonetype'
+													margin="dense"
+													id="type"
+													label="Phone Type"
+													fullWidth
+													variant="standard"
+													value={data.phonetype}
+													onChange={handleChange}
+													InputLabelProps={{ shrink: true }}
+												/>
+											
+											</DialogContent>
+											<DialogActions>
+												<Button onClick={handleClose}>Cancel</Button>
+												<Button onClick={editUserInfo}>Submit</Button>
+											</DialogActions>
+										</Dialog>
 									</li>
+						
 									<li>
 										Deactive
 									</li>

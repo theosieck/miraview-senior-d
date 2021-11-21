@@ -96,4 +96,8 @@ hr
     padding: 15px 20px;
     display: block;
 }
-  
+
+.Button {
+    display:block;
+    width:100%
+}
