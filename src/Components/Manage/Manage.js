@@ -1,4 +1,4 @@
-import React, {useState, useRef} from 'react';
+import React, {useState, useRef, useEffect} from 'react';
 import { useSelector, useDispatch } from "react-redux";
 import { auth, getClientsList } from "../../firebase/Firebase";
 import { getSingleClient } from "../../firebase/Firebase";
@@ -31,27 +31,20 @@ import FindClient from './FindClient';
 // }
 
 function Manage() {
-	// redirect to / if not logged in
 	const userData = useSelector((state) => state.user);
-
 	const clientListData = useSelector((state) => state.clientsList);
 	let info;
 	if (clientListData && clientListData.clients) info = clientListData.clients;
 	else info = {};
-	// const dispatch = useDispatch();
-	// const fetchData = async (dispatch) => {
-	// 	const result = await storeClientList(dispatch);
-	// 	if (result) info = result;
-	// }
-	// fetchData(dispatch);
-	
+
+	// redirect to / if not logged in
 	if (!userData.data) return <Redirect to='/'/>;
 
 	return (
 		<div>
 			<hr />
 			<ClientList data={info}/>
-			<FindClient />
+			{/* <FindClient /> */}
 		</div>
 	);
 }
@@ -243,6 +236,7 @@ function ClientList(props) {
 					</Grid>
 				</Grid>
 			</Box>
+			<FindClient handleClientListClick={handleClientListClick} />
 		</div>
 	);
 }

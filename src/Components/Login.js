@@ -7,66 +7,13 @@ import { auth } from "../firebase/Firebase";
 import { useReducer, useState } from "react";
 import { getClientsList, getClientStatistics, getTherapistInfo, getSingleClient  } from "../firebase/Firebase";
 import Alert from '@material-ui/lab/Alert';
-
-const getDummyData = () => {
-	return {
-		id: 'test',
-		email: 'email@gmail.com',
-		name: 'therapist name',
-		patients: []
-	}
-}
-
-const storeClientList = async (dispatch) => {
-	let clients;
-	try {
-		clients = await getClientsList(null, auth);
-		clients = clients.data.data;
-	} catch (e) {
-		console.log(e);
-	}
-
-	// update redux store with client data
-	dispatch({
-		type: 'SET_CLIENT_DATA',
-		payload: {
-			clients: clients		
-		}
-	});
-}
-
-const storeClientStatistics = async (dispatch) => {
-	// pull client statistics data from firebase
-	let clientStatisticsData;
-	try {
-		let clientStatistics = await getClientStatistics(null, auth);
-		//console.log('--Client Statistics Data Here--');
-		// .data gives {code:..., data:...} so do .data.data
-		clientStatisticsData = clientStatistics.data.data;
-		//console.log(clientStatisticsData);
-	} catch (e) {
-		console.log(e);
-		alert(e);
-	}
-	
-	// update redux store with client statistics data
-	dispatch({
-		type: 'SET_CLIENT_STATISTICS_DATA',
-		payload: {
-			idObjects: clientStatisticsData
-		}
-	})
-}
-
-// TODO styling
+import { storeClientList, storeClientStatistics } from '../firebase/fetchData';
 
 export default function Login() {
 	// userReducer
 	const userData = useSelector((state) => state.user);
-	console.log(userData);
 	const dispatch = useDispatch();
 	let error;
-	// console.log(auth);
 
 	//error message
 	const [login,setLogin]=useState(false);
@@ -78,18 +25,6 @@ export default function Login() {
 	// singleClientReducer
 	const singleClientData = useSelector((state) => state.singleClient);
 	console.log(singleClientData);
-
-	// TESTING ONLY
-	const createUser = async () => {
-		let result;
-		try {
-			result = await createUserWithEmailAndPassword(auth, 'testing@test.test', '1234test');
-			console.log ('user should be created');
-			console.log(result);
-		} catch (e) {
-			console.log(e);
-		}
-	}
 
 	// login function
 	const logUserIn = async (e) => {
@@ -119,37 +54,15 @@ export default function Login() {
 		let result;
 		try {
 			result = await signInWithEmailAndPassword(auth, email, password);
-			// console.log(auth);
-			// console.log(result);
-			// const res = await getClientsList(null, auth);
-			// console.log(res);
 		} catch (err) {
 			error = err;
 			console.log(err);
 			setLogin(true);
-			// handle error - TODO
-			/** errors look like this
-			 * {
-					"error": {
-						"code": 400,
-						"message": "INVALID_EMAIL",
-						"errors": [
-						{
-							"message": "INVALID_EMAIL",
-							"domain": "global",
-							"reason": "invalid"
-						}
-						]
-					}
-				}
-			 */
 		}
 
-		// if successful, pull data from firebase - eddie your stuff goes here
-		//console.log(error);
+		// if successful, pull data from firebase
 		if (!error) {
 			const user = await getTherapistInfo(null,auth);
-			console.log(user)
 			var status=user.data.code;
 
 			// gets from firebase and stores in redux the client statistics
@@ -159,12 +72,10 @@ export default function Login() {
 			storeClientList(dispatch);
 
 			// if we did not get a user, call signOut() and don't log the user in
-			// eddie you might have to change this conditional depending on what the return for not finding a user is
 			if (status==500) {
 				// sign out of firebase auth
 				await signOut(auth);
 			} else {
-				console.log('tried to log in');
 				// send dispatch to redux
 				dispatch({
 					type: 'LOG_IN',
@@ -176,6 +87,7 @@ export default function Login() {
 			}
 		}
 	}
+
 	// if user is logged in redirect to homepage
 	if (userData.data) return <Redirect to='/home'/>;
 
