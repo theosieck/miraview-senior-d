@@ -131,22 +131,20 @@ function ClientGrid(props)
 	let clientStats = props.clientStats;
 	const clientInfoList = [];
 	const clientIDs = Object.keys(clientList);
-	console.log(clientList);
-	for (let index=0;index<clientIDs.length;index++) {
+	for (let index=0; index < clientIDs.length; index++) {
 		const id = clientIDs[index];
 		const name = clientList[id];
+		const stat = clientStats.idObjects[id];
+		// prevent crash of trying to read data of null
+		if (stat === null || stat === undefined) {
+			break
+		}
 		clientInfoList.push(
 			<div className="individualRow">
-				<ClientRow id={id} name={name} groundingActivations={clientStats.groundingActivations[index] ? clientStats.groundingActivations[index].allTime : 0} symptomReports={clientStats.symptomReports[index] ? clientStats.symptomReports[index].allTime : 0}></ClientRow>
+				<ClientRow id={id} name={name} groundingActivations={stat.groundingActivations.allTime} symptomReports={stat.symptomReports.allTime}></ClientRow>
 			</div>
 		)
 	}
-	console.log(clientInfoList);
-	// const clientInfoList = clientList.map(({id, name}, index) =>
-	// 	<div className="individualRow">
-	// 		<ClientRow id={id} name={name} groundingActivations={clientStats.groundingActivations[index] ? clientStats.groundingActivations[index].allTime : 0} symptomReports={clientStats.symptomReports[index] ? clientStats.symptomReports[index].allTime : 0}></ClientRow>
-	// 	</div>
-	// 	);
 
 	return(
 		<Box>

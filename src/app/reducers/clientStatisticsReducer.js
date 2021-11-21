@@ -1,7 +1,5 @@
 const initalState = {
-	ids: [null],
-	groundingActivations: [null],
-	symptomReports: [null]
+	idObjects: [null]
 };
   
 const clientStatisticsReducer = (state = initalState, action) => {
@@ -12,15 +10,11 @@ const clientStatisticsReducer = (state = initalState, action) => {
 		case 'SET_CLIENT_STATISTICS_DATA':
 			//console.log('payload', payload);
 			return {
-				ids: payload.ids,
-				groundingActivations: payload.groundingActivations,
-				symptomReports: payload.symptomReports
+				idObjects: payload.idObjects
 			};
 		case 'CLEAR_CLIENT_STATISTICS_DATA':
 			return {
-				ids: [null],
-				groundingActivations: [null],
-				symptomReports: [null]
+				idObjects: [null]
 			};
 
 		default:

@@ -16,6 +16,7 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import {editClientInfo} from "../../firebase/Firebase";
+import FindClient from './FindClient';
 
 function Manage() {
 	// redirect to / if not logged in
@@ -32,6 +33,7 @@ function Manage() {
 		<div>
 			<hr />
 			<ClientList data={info}/>
+			<FindClient />
 		</div>
 	);
 }

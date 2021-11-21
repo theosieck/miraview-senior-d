@@ -40,8 +40,7 @@ const storeClientStatistics = async (dispatch) => {
 	let clientStatisticsData;
 	try {
 		let clientStatistics = await getClientStatistics(null, auth);
-		console.log('--Client Statistics Data Here--');
-		//console.log(clientStatistics);
+		//console.log('--Client Statistics Data Here--');
 		// .data gives {code:..., data:...} so do .data.data
 		clientStatisticsData = clientStatistics.data.data;
 		//console.log(clientStatisticsData);
@@ -49,14 +48,12 @@ const storeClientStatistics = async (dispatch) => {
 		console.log(e);
 		alert(e);
 	}
-
+	
 	// update redux store with client statistics data
 	dispatch({
 		type: 'SET_CLIENT_STATISTICS_DATA',
 		payload: {
-			ids: 					clientStatisticsData.map(function(x) {return x.id}),
-			groundingActivations: 	clientStatisticsData.map(function(x) {return x.groundingActivations}),
-			symptomReports: 		clientStatisticsData.map(function(x) {return x.symptomReports})
+			idObjects: clientStatisticsData
 		}
 	})
 }
