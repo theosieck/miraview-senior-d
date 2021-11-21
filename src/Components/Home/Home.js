@@ -1,17 +1,14 @@
 import React, { useEffect } from 'react';
 import { useSelector, useDispatch } from "react-redux";
 import { Redirect } from 'react-router-dom';
-import { makeStyles } from '@material-ui/core/styles';
-import { Box, Grid, Paper, Avatar } from '@material-ui/core';
+import { Box, Grid, Avatar } from '@material-ui/core';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import PeopleIcon from '@mui/icons-material/People';
-import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 import TrendingDownIcon from '@mui/icons-material/TrendingDown';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import Button from '@mui/material/Button';
 import ArrowRightAlt from '@mui/icons-material/ArrowRightAlt';
-import {auth} from '../../firebase/Firebase';
-import { storeClientList, storeClientStatistics } from '../../firebase/fetchData';
+import { storeClientList, storeClientStatistics, storeUser } from '../../firebase/fetchData';
 
 function Home () {
 	// pull data from redux store
@@ -23,17 +20,19 @@ function Home () {
 	useEffect(() => {
 		storeClientList(dispatch);
 		storeClientStatistics(dispatch);
+		storeUser(dispatch);
 	}, []);
+
 	// redirect to / if not logged in
 	if (!userData.data) return <Redirect to='/'/>;
+
 	let clients;
 	if (clientListData && clientListData.clients) ({clients} = clientListData);
 	else clients = {};
 
-	if (!userData.data) return <Redirect to='/'/>;
-
-	let activeTodayClientsInfo = userData.data.data.data.numActiveClients;
-	let activeClientsInfo = userData.data.data.data.clients.length;
+	let activeTodayClientsInfo = userData.data.numActiveClients;
+	let activeClientsInfo = 0;
+	if (userData && userData.data && userData.data.clients) activeClientsInfo = userData.data.clients.length;
 
 	return(
 		<div>
@@ -69,12 +68,16 @@ function ClientOverview(props)
 
 function ClientRow(props)
 {
+	let groundingAllTime = 0;
+	if (props && props.stats && props.stats.groundingActivations) groundingAllTime = props.stats.groundingActivations.allTime;
+	let symptomsAllTime = 0;
+	if (props && props.stats && props.stats.symptomReports) symptomsAllTime = props.stats.symptomReports.allTime;
 	const info = {
 		clientName: props.name,
 		email: props.stats.email,
 		id: props.id,
-		groundingActivations: props.stats.groundingActivations.allTime || 0,
-		symptomReports: props.stats.symptomReports.allTime || 0
+		groundingActivations: groundingAllTime || 0,
+		symptomReports: symptomsAllTime || 0
 	};
 
 	return (

@@ -1,5 +1,5 @@
 import { initializeApp } from 'firebase/app';
-import { getAuth, onAuthStateChanged } from 'firebase/auth';
+import { getAuth } from 'firebase/auth';
 import { getFunctions, httpsCallable } from 'firebase/functions';
 
 // add our api keys
@@ -43,11 +43,6 @@ getClientsList().then((result) => {
 	// Catch any errors in here
 });
 */
-
-// detect auth state - TODO
-// onAuthStateChanged(auth, (user) => {
-
-// })
 
 export default firebaseApp;
 export {auth};

@@ -4,7 +4,7 @@ import Manage from "./Components/Manage/Manage";
 import Nav from "./Components/Nav";
 import LoginNav from "./Components/LoginNav";
 // external components
-import {BrowserRouter as Router, Route, Switch, Redirect} from 'react-router-dom';
+import {BrowserRouter as Router, Route, Switch} from 'react-router-dom';
 import Login from "./Components/Login";
 
 function App() {

@@ -21,12 +21,23 @@ export default function FindClient (props) {
 
 		// get the email we're looking for
 		let email = document.getElementById('client-email').value;
-		email = email.trim();
+
+		// make sure exists, is string, etc
+		try {
+			if (!email) throw Error('Please enter an email.');
+			if (typeof email!=='string') throw Error('Email must be a string.');
+			email = email.trim();
+			if (email==='') throw Error('Email must contain at least one character.');
+		} catch (e) {
+			setError(e.toString());
+			return;
+		}
 
 		// look for the client
 		let result;
 		try {
 			result = await findClient({email}, auth);
+			if (!result || !result.data) throw Error('Something went wrong fetching the client.');
 			if (result.data.code!==200) throw result.data;
 		} catch (e) {
 			if (e.message) setError(e.message);
@@ -34,10 +45,16 @@ export default function FindClient (props) {
 			setLoading(false);
 			return;
 		}
-
 		const client = result.data.data;
+		
+		// null check
+		if (!userData || !userData.data || !userData.data.clients) {
+			setError('No user data found.');
+			setLoading(false);
+			return;
+		}
 		// make sure client isn't already a client of this therapist
-		if (userData.data.data.data.clients.includes(client.uid)) {
+		if (userData.data.clients.includes(client.uid)) {
 			setError('This client is already in your client list.');
 			setLoading(false);
 			return;
@@ -66,6 +83,7 @@ export default function FindClient (props) {
 		let result;
 		try {
 			result = await updateTherapist({clients:[clientID]}, auth);
+			if (!result || !result.data) throw Error('Error updating therapist.');
 			if (result.data.code!==200) throw result.data;
 		} catch (e) {
 			if (e.message) setError(e.message);
