@@ -28,7 +28,7 @@ function Home () {
 	if (clientListData && clientListData.clients) ({clients} = clientListData);
 	else clients = {};
 
-	if (!userData.data || !auth.currentUser) return <Redirect to='/'/>;
+	if (!userData.data) return <Redirect to='/'/>;
 
 	let activeClientsInfo = userData.data.data.data.clients.length;
 	// testing to make sure auth will work across pages
