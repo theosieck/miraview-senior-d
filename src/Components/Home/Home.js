@@ -28,7 +28,7 @@ function Home () {
 	if (clientListData && clientListData.clients) ({clients} = clientListData);
 	else clients = {};
 
-	if (!userData.loggedIn) return <Redirect to='/'/>;
+	if (!userData.data) return <Redirect to='/'/>;
 
 	let activeClientsInfo = userData.data.data.data.clients.length;
 	// testing to make sure auth will work across pages
@@ -134,6 +134,10 @@ function ClientGrid(props)
 	for (let index=0; index < clientIDs.length; index++) {
 		const id = clientIDs[index];
 		const name = clientList[id];
+		// prevent crash on undefined
+		if (!clientStats || !clientStats.idObjects) {
+			break;
+		}
 		const stat = clientStats.idObjects[id];
 		// prevent crash of trying to read data of null
 		if (stat === null || stat === undefined) {

@@ -20,7 +20,7 @@ function Manage() {
 	if (clientListData && clientListData.clients) info = clientListData.clients;
 	else info = {};
 
-	if (!userData.loggedIn) return <Redirect to='/'/>;
+	if (!userData.data) return <Redirect to='/'/>;
 
 	return (
 		<div>

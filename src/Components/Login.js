@@ -166,9 +166,7 @@ export default function Login() {
 		}
 	}
 	// if user is logged in redirect to homepage
-	if (userData && userData.loggedIn) return <Redirect to='/home'/>;
-
-	
+	if (userData.data) return <Redirect to='/home'/>;
 
 	return (
 		<>
