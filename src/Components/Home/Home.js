@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useSelector, useDispatch } from "react-redux";
 import { Redirect } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
@@ -25,9 +25,11 @@ function Home () {
 	
 	const dispatch = useDispatch();
 	// refetch data from firebase and store in redux
-	storeClientList(dispatch);
-	storeClientStatistics(dispatch);
-
+	useEffect(() => {
+		storeClientList(dispatch);
+		storeClientStatistics(dispatch);
+	}, []);
+	
 	// redirect to / if not logged in
 	if (!userData.data) return <Redirect to='/'/>;
 

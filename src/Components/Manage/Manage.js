@@ -1,4 +1,4 @@
-import React, {useState, useRef} from 'react';
+import React, {useState, useRef, useEffect} from 'react';
 import { useSelector, useDispatch } from "react-redux";
 import { auth } from "../../firebase/Firebase";
 import { getSingleClient } from "../../firebase/Firebase";
@@ -21,7 +21,7 @@ function Manage() {
 
 	const dispatch = useDispatch();
 	// refetch data from firebase
-	storeClientList(dispatch);
+	useEffect(() => {storeClientList(dispatch)}, []);
 
 	// redirect to / if not logged in
 	if (!userData.data) return <Redirect to='/'/>;
