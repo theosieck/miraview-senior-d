@@ -109,7 +109,8 @@ function Profile (props) {
 		try {
 			setOpen(false);
 			setIsActive(!isActive);
-			await editClientInfo(data,auth);
+			const edit=await editClientInfo(data,auth);
+			console.log(edit);
 		} catch (e) {
 			console.log(e);
 		}

@@ -29,7 +29,6 @@ const getSingleClient = httpsCallable(firebaseFunctions, 'getSingleClient');
 const updateTherapist = httpsCallable(firebaseFunctions, 'updateTherapist');
 const getTherapistInfo=httpsCallable(firebaseFunctions,'getTherapistInfo')
 const editClientInfo=httpsCallable(firebaseFunctions,'editClientInfo');
-const getTherapistInfo=httpsCallable(firebaseFunctions,'getTherapistInfo');
 const findClient = httpsCallable(firebaseFunctions, 'findClient');
 
 /* Call functions like this:
