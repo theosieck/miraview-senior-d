@@ -5,7 +5,6 @@ const initalState = {
 };
   
 const userReducer = (state = initalState, action) => {
-	console.log(action);
 	const { type, payload } = action;
 
 	switch (type) {
@@ -21,6 +20,11 @@ const userReducer = (state = initalState, action) => {
 				loggedIn: false,
 				id: null,
 				data: null
+			}
+		case 'UPDATE_USER':
+			return {
+				...state,
+				data: payload.data
 			}
 
 		default:
