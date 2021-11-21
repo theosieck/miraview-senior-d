@@ -98,11 +98,16 @@ export default function Login() {
 		// reset error
 		error = null;
 		// get inputs
-		const email = document.getElementById('email').value;
+		let email = document.getElementById('email').value;
 		const password = document.getElementById('password').value;
 		// console.log(email, password);
 
-		// do some input checks before we send to firebase - TODO
+		// make sure email and password exist and are nonempty strings
+		try {
+			if (!email) throw Error('Please enter an email.');
+			if (typeof email!=='string') throw Error('Email must be a string.');
+			
+		}
 
 		// send auth to firebase
 		let result;
