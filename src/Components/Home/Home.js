@@ -90,7 +90,7 @@ function ClientRow(props)
 					</Grid>
 					<Grid item xs={9}>
 						<h3 className="name">{info.clientName}</h3>
-						<h4 className="email">{info.email.length <= 20 ? info.email : info.email.substring(0, info.email.length-2) + "..."}</h4>
+						<h4 className="email">{info.email.length <= 20 ? info.email : info.email.substring(0, 18) + "..."}</h4>
 					</Grid>
 				</Grid>
 			</Grid>
