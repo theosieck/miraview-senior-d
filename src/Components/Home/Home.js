@@ -136,7 +136,7 @@ function ClientGrid(props)
 		const name = clientList[id];
 		const stat = clientStats.idObjects[id];
 		// prevent crash of trying to read data of null
-		if (stat == null) {
+		if (stat === null || stat === undefined) {
 			break
 		}
 		clientInfoList.push(
