@@ -9,7 +9,7 @@
     margin-block-end: 0;
 }
 
-.age
+.email
 {
     margin-block-start: 0;
 }
@@ -22,6 +22,7 @@
 .MuiGrid-container
 {
     align-items: center;
+    align-content: space-around;
 }
 
 .outer-grid {

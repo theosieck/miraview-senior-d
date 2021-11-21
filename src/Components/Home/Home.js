@@ -32,11 +32,12 @@ function Home () {
 
 	if (!userData.data) return <Redirect to='/'/>;
 
+	let activeTodayClientsInfo = userData.data.data.data.numActiveClients;
 	let activeClientsInfo = userData.data.data.data.clients.length;
 
 	return(
 		<div>
-			<ClientOverview activeClients={activeClientsInfo}/>
+			<ClientOverview activeToday={activeTodayClientsInfo} activeClients={activeClientsInfo}/>
 			<ClientGrid clientList={clients} clientStats={clientsStatisticsData}></ClientGrid>
 		</div>
 	);	   
@@ -44,6 +45,7 @@ function Home () {
 
 function ClientOverview(props)
 {
+	let activeToday = props.activeToday;
 	let activeClients = props.activeClients
 	return (
 		<div style={{ width: '70%', borderBottom: '1px solid gray', marginBottom: "10px"}}>
@@ -54,7 +56,7 @@ function ClientOverview(props)
 						</h4>
 					</Grid>
 					<Grid item xs={6} sm={3}>
-						<PlayArrowIcon fontSize="small"></PlayArrowIcon>3 Active Today
+						<PlayArrowIcon fontSize="small"></PlayArrowIcon>{activeToday} Active Today
 					</Grid>
 					<Grid item xs={6} sm={3}>
 						<PeopleIcon fontSize="small"></PeopleIcon>{activeClients} Active Clients
@@ -69,9 +71,10 @@ function ClientRow(props)
 {
 	const info = {
 		clientName: props.name,
+		email: props.stats.email,
 		id: props.id,
-		groundingActivations: props.groundingActivations || 0,
-		symptomReports: props.symptomReports || 0
+		groundingActivations: props.stats.groundingActivations.allTime || 0,
+		symptomReports: props.stats.symptomReports.allTime || 0
 	};
 
 	return (
@@ -83,7 +86,7 @@ function ClientRow(props)
 					</Grid>
 					<Grid item xs={9}>
 						<h3 className="name">{info.clientName}</h3>
-						<h4 className="age">Age: 42</h4>
+						<h4 className="email">{info.email.length <= 20 ? info.email : info.email.substring(0, 18) + "..."}</h4>
 					</Grid>
 				</Grid>
 			</Grid>
@@ -141,7 +144,7 @@ function ClientGrid(props)
 		}
 		clientInfoList.push(
 			<div className="individualRow">
-				<ClientRow id={id} name={name} groundingActivations={stat.groundingActivations.allTime} symptomReports={stat.symptomReports.allTime}></ClientRow>
+				<ClientRow id={id} name={name} stats={stat}></ClientRow>
 			</div>
 		)
 	}
