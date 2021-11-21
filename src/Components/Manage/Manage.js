@@ -1,6 +1,6 @@
 import React, {useState, useRef} from 'react';
 import { useSelector, useDispatch } from "react-redux";
-import { auth } from "../../firebase/Firebase";
+import { auth, getClientsList } from "../../firebase/Firebase";
 import { getSingleClient } from "../../firebase/Firebase";
 import { Redirect } from 'react-router-dom';
 import {Box, Grid, Button, TextField, Card, Divider, CardHeader, Avatar, Typography, makeStyles} from "@material-ui/core"
@@ -11,6 +11,25 @@ import PersonOutlineIcon from '@mui/icons-material/PersonOutline';
 import './Manage.css';
 import FindClient from './FindClient';
 
+// const storeClientList = async (dispatch) => {
+// 	let clients;
+// 	try {
+// 		clients = await getClientsList(null, auth);
+// 		clients = clients.data.data;
+// 	} catch (e) {
+// 		console.log(e);
+// 	}
+
+// 	// update redux store with client data
+// 	dispatch({
+// 		type: 'SET_CLIENT_DATA',
+// 		payload: {
+// 			clients: clients		
+// 		}
+// 	});
+// 	return clients;
+// }
+
 function Manage() {
 	// redirect to / if not logged in
 	const userData = useSelector((state) => state.user);
@@ -19,7 +38,13 @@ function Manage() {
 	let info;
 	if (clientListData && clientListData.clients) info = clientListData.clients;
 	else info = {};
-
+	// const dispatch = useDispatch();
+	// const fetchData = async (dispatch) => {
+	// 	const result = await storeClientList(dispatch);
+	// 	if (result) info = result;
+	// }
+	// fetchData(dispatch);
+	
 	if (!userData.data) return <Redirect to='/'/>;
 
 	return (
