@@ -29,6 +29,9 @@ function Home () {
 	let clients;
 	if (clientListData && clientListData.clients) ({clients} = clientListData);
 	else clients = {};
+
+	if (!userData.data) return <Redirect to='/'/>;
+
 	let activeClientsInfo = userData.data.data.data.clients.length;
 
 	return(
