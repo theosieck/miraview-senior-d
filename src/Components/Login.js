@@ -1,5 +1,5 @@
 // sign in -> use redux for context
-import { useSelector, useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Redirect } from 'react-router-dom';
 import { Button, CircularProgress, Grid, TextField } from '@mui/material';
 import { signInWithEmailAndPassword, signOut } from 'firebase/auth';

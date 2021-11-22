@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import { useSelector, useDispatch } from "react-redux";
+import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from "react-redux";
 import { Redirect } from 'react-router-dom';
-import { Box, Grid, Avatar, CircularProgress } from '@material-ui/core';
+import { Avatar, Box, CircularProgress, Grid } from '@material-ui/core';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import PeopleIcon from '@mui/icons-material/People';
 import TrendingDownIcon from '@mui/icons-material/TrendingDown';
