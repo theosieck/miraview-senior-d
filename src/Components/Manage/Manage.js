@@ -17,6 +17,7 @@ import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import {editClientInfo} from "../../firebase/Firebase";
 import FindClient from './FindClient';
+import Alert from '@material-ui/lab/Alert';
 
 function Manage() {
 	// redirect to / if not logged in
@@ -90,6 +91,8 @@ function Profile (props) {
 
 	const [data,setData]=useState({uid:clientID,lastname:'',gender:'',sex:'',secondaryemail:'',phonenumber:'',phonetype:''})
 
+	const [email,setEmail]=useState(false);
+
 	const handleClickOpen = () => {
 		setOpen(true);
 	};
@@ -105,15 +108,27 @@ function Profile (props) {
 			...prevState,
 			[name]: value
 		}));
+
 	};
+		
+	
 
 	//calls the API to updat the user info 
 	const editUserInfo = async () => {
 		try {
-			setOpen(false);
 			//setIsActive(!isActive);
-			const edit=await editClientInfo(data,auth);
-			console.log(edit);
+			let re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+			if(re.test(data.secondaryemail)){
+				setOpen(false);
+				const edit=await editClientInfo(data,auth);
+				console.log(edit);
+			}
+			else{
+				setEmail(true);
+			}
+	
+
+			
 		} catch (e) {
 			console.log(e);
 		}
@@ -219,6 +234,7 @@ function Profile (props) {
 												/>
 											
 											</DialogContent>
+											{email && <Alert severity="error">Enter email with correct format!</Alert>}
 											<DialogActions>
 												<Button onClick={handleClose}>Cancel</Button>
 												<Button onClick={editUserInfo}>Submit</Button>
