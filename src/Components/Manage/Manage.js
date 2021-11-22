@@ -70,13 +70,25 @@ const storeSingleClient = async (dispatch, clientID) => {
 }
 
 function Profile (props) {
-	const clientID = props.id;
 	const dropdownRef=useRef(null);
 	const [isActive,setIsActive]=useDetectOutsideClick(dropdownRef,false);
 	const onClick =() => setIsActive(!isActive);
+	const clientData = useSelector((state) => state.singleClient);
 
 	// when a name in list is clicked, get that client's data and store it in redux
-	storeSingleClient(useDispatch(), clientID);
+	storeSingleClient(useDispatch(), props.id);
+
+	let clientInfo = {};
+	if (clientData && clientData.data)
+	{
+		//clientInfo.email ??
+		clientInfo.lastName = clientData.data.lastname || 'N/A';
+		clientInfo.sex = clientData.data.sex || 'N/A';
+		clientInfo.gender = clientData.data.gender || 'N/A';
+		clientInfo.secondEmail = clientData.data.secondaryemail || 'N/A';
+		clientInfo.phoneNumber = clientData.data.phonenumber || 'N/A';
+		clientInfo.phoneType = clientData.data.phoneType || 'N/A';
+	}
 	
 	return (
 		<Card>
@@ -113,14 +125,14 @@ function Profile (props) {
 				<div>
 					<p><strong>First Name: </strong>{(props.name).split(' ')[0]}</p>
 					<p><strong>Last Name: </strong>{(props.name).split(' ')[1]}</p>
-					<p><strong>Gender: </strong>M</p>
-					<p><strong>Sex: </strong>M</p>
+					<p><strong>Gender: </strong>{clientInfo.gender}</p>
+					<p><strong>Sex: </strong>{clientInfo.sex}</p>
 				</div>
 				<div>	
 					<p><strong>Email: </strong>ngattusohw@gmail.com</p>
-					<p><strong>Secondary Email: </strong>ngattuso205@gmail.com</p>
-					<p><strong>Phone number: </strong>9089101254</p>
-					<p><strong>Phone Type: </strong>Cell</p>
+					<p><strong>Secondary Email: </strong>{clientInfo.secondEmail}</p>
+					<p><strong>Phone number: </strong>{clientInfo.phoneNumber}</p>
+					<p><strong>Phone Type: </strong>{clientInfo.phoneType}</p>
 				</div>
 			</div>
 		</Card>
@@ -129,9 +141,6 @@ function Profile (props) {
 
 function ClientList(props) {
 	const classes = useStyles();
-	let clientList = props.data;
-	//TODO - Switch names with actualinfo
-	const names = ['Nicholas Gattuso', 'Essence Peters', 'Derek Morris', 'Alex Conetta', 'Gene Donovan', 'Alex Stupar', 'Nicholas Gattuso'];
 	
 	// state hooks
 	const [clients, addClient] = useState(props.data);
@@ -159,7 +168,6 @@ function ClientList(props) {
 			</List>
 		);
 	}
-	console.log(listClients);
 	// const listClients = clients.map(({id, name}, index) => 
 	// 	<List component='div' className={classes.list}>
 	// 		<ListItemButton selected={selectedIndex === index} onClick={() => handleClientListClick(id, name)}>
