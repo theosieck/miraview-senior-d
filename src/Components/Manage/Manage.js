@@ -97,12 +97,12 @@ function Profile (props) {
 		try {
 			//setIsActive(!isActive);
 			let re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-			if(re.test(data.secondaryemail)){
+			if(!data.secondaryemail || re.test(data.secondaryemail)){
 				setOpen(false);
 				const edit=await editClientInfo(data,auth);
 				console.log(edit);
 			}
-			else{
+			else {
 				setEmail(true);
 			}
 	
