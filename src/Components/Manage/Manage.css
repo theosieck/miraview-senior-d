@@ -97,6 +97,10 @@ hr
     display: block;
 }
 
+.Button {
+    display:block;
+    width:100%
+}
 #find-client {
     max-width: 350px;
     margin-left: 10px;
