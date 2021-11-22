@@ -1,7 +1,7 @@
 // sign in -> use redux for context
-import { useSelector, useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Redirect } from 'react-router-dom';
-import { Button,TextField } from '@mui/material';
+import { Button, CircularProgress, Grid, TextField } from '@mui/material';
 import { signInWithEmailAndPassword, signOut } from 'firebase/auth';
 import { auth } from "../firebase/Firebase";
 import { useState } from "react";
@@ -14,11 +14,14 @@ export default function Login() {
 	const dispatch = useDispatch();
 	let error;
 	const [login,setLogin]=useState(false);	// login error
+	const [loading, setLoading] = useState(false); 
 
 	// login function
 	const logUserIn = async (e) => {
 		// prevent default
 		e.preventDefault();
+		// Initiate loading screen
+		setLoading(true);
 		// reset error
 		error = null;
 		// get inputs
@@ -75,10 +78,26 @@ export default function Login() {
 				});
 			}
 		}
+		setLoading(false);
 	}
 
 	// if user is logged in redirect to homepage
 	if (userData.data) return <Redirect to='/home'/>;
+
+	if (loading) {
+		return (
+			<Grid
+				container
+				spacing={0}
+				direction="column"
+				alignItems="center"
+				justifyContent="center"
+				style={{ minHeight: '100vh' }}
+			>
+				<CircularProgress/>
+			</Grid>
+		);
+	}
 
 	return (
 		<>

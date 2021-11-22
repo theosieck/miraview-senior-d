@@ -1,7 +1,7 @@
-import React, { useEffect } from 'react';
-import { useSelector, useDispatch } from "react-redux";
+import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from "react-redux";
 import { Redirect } from 'react-router-dom';
-import { Box, Grid, Avatar } from '@material-ui/core';
+import { Avatar, Box, CircularProgress, Grid } from '@material-ui/core';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import PeopleIcon from '@mui/icons-material/People';
 import TrendingDownIcon from '@mui/icons-material/TrendingDown';
@@ -11,6 +11,7 @@ import ArrowRightAlt from '@mui/icons-material/ArrowRightAlt';
 import { storeClientList, storeClientStatistics, storeUser } from '../../firebase/fetchData';
 
 function Home () {
+	const [loading, setLoading] = useState(true); 
 	// pull data from redux store
 	const userData = useSelector((state) => state.user);
 	const clientsStatisticsData = useSelector((state) => state.clientStatistics);
@@ -21,10 +22,26 @@ function Home () {
 		storeClientList(dispatch);
 		storeClientStatistics(dispatch);
 		storeUser(dispatch);
+		setLoading(false);
 	}, []);
 
 	// redirect to / if not logged in
 	if (!userData.data) return <Redirect to='/'/>;
+
+	if (loading) {
+		return (
+			<Grid
+				container
+				spacing={0}
+				direction="column"
+				alignItems="center"
+				justifyContent="center"
+				style={{ minHeight: '100vh' }}
+			>
+				<CircularProgress/>
+			</Grid>
+		);
+	}
 
 	let clients;
 	if (clientListData && clientListData.clients) ({clients} = clientListData);
