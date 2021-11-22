@@ -124,7 +124,7 @@ function Profile (props) {
 			<div class="profile-body">
 				<div>
 					<p><strong>First Name: </strong>{(props.name).split(' ')[0]}</p>
-					<p><strong>Last Name: </strong>{(props.name).split(' ')[1]}</p>
+					<p><strong>Last Name: </strong>{clientInfo.lastName}</p>
 					<p><strong>Gender: </strong>{clientInfo.gender}</p>
 					<p><strong>Sex: </strong>{clientInfo.sex}</p>
 				</div>
