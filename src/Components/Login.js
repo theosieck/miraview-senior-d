@@ -1,144 +1,60 @@
 // sign in -> use redux for context
-import { useSelector, useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { Redirect } from 'react-router-dom';
-import { Button,TextField } from '@mui/material';
-import { signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from 'firebase/auth';
+import { Button, CircularProgress, Grid, TextField } from '@mui/material';
+import { signInWithEmailAndPassword, signOut } from 'firebase/auth';
 import { auth } from "../firebase/Firebase";
-import { useReducer, useState } from "react";
-import { getClientsList, getClientStatistics, getTherapistInfo, getSingleClient  } from "../firebase/Firebase";
+import { useState } from "react";
+import { getTherapistInfo} from "../firebase/Firebase";
 import Alert from '@material-ui/lab/Alert';
-
-const getDummyData = () => {
-	return {
-		id: 'test',
-		email: 'email@gmail.com',
-		name: 'therapist name',
-		patients: []
-	}
-}
-
-const storeClientList = async (dispatch) => {
-	let clients;
-	try {
-		clients = await getClientsList(null, auth);
-		clients = clients.data.data;
-	} catch (e) {
-		console.log(e);
-	}
-
-	// update redux store with client data
-	dispatch({
-		type: 'SET_CLIENT_DATA',
-		payload: {
-			clients: clients		
-		}
-	});
-}
-
-const storeClientStatistics = async (dispatch) => {
-	// pull client statistics data from firebase
-	let clientStatisticsData;
-	try {
-		let clientStatistics = await getClientStatistics(null, auth);
-		//console.log('--Client Statistics Data Here--');
-		// .data gives {code:..., data:...} so do .data.data
-		clientStatisticsData = clientStatistics.data.data;
-		//console.log(clientStatisticsData);
-	} catch (e) {
-		console.log(e);
-		alert(e);
-	}
-	
-	// update redux store with client statistics data
-	dispatch({
-		type: 'SET_CLIENT_STATISTICS_DATA',
-		payload: {
-			idObjects: clientStatisticsData
-		}
-	})
-}
-
-// TODO styling
+import { storeClientList, storeClientStatistics } from '../firebase/fetchData';
 
 export default function Login() {
-	// userReducer
 	const userData = useSelector((state) => state.user);
-	console.log(userData);
 	const dispatch = useDispatch();
 	let error;
-	// console.log(auth);
-
-	//error message
-	const [login,setLogin]=useState(false);
-
-	// clientReducer
-	const clientsData = useSelector((state) => state.clientStatistics);
-	console.log(clientsData);
-
-	// singleClientReducer
-	const singleClientData = useSelector((state) => state.singleClient);
-	console.log(singleClientData);
-
-	// TESTING ONLY
-	const createUser = async () => {
-		let result;
-		try {
-			result = await createUserWithEmailAndPassword(auth, 'testing@test.test', '1234test');
-			console.log ('user should be created');
-			console.log(result);
-		} catch (e) {
-			console.log(e);
-		}
-	}
+	const [login,setLogin]=useState(false);	// login error
+	const [loading, setLoading] = useState(false); 
 
 	// login function
 	const logUserIn = async (e) => {
 		// prevent default
 		e.preventDefault();
+		// Initiate loading screen
+		setLoading(true);
 		// reset error
 		error = null;
 		// get inputs
-		const email = document.getElementById('email').value;
+		let email = document.getElementById('email').value;
 		const password = document.getElementById('password').value;
-		// console.log(email, password);
 
-		// do some input checks before we send to firebase - TODO
+		// make sure email and password exist and are nonempty strings
+		try {
+			if (!email) throw Error('Please enter an email.');
+			if (!password) throw Error('Please enter a password.');
+			if (typeof email!=='string') throw Error('Email must be a string.');
+			if (typeof password!=='string') throw Error('Password must be a string.');
+			email = email.trim();
+			if (email==='') throw Error('Email must contain at least one character.');
+		} catch (e) {
+			error = e.toString();
+			return;
+		}
 
 		// send auth to firebase
 		let result;
 		try {
 			result = await signInWithEmailAndPassword(auth, email, password);
-			// console.log(auth);
-			// console.log(result);
-			// const res = await getClientsList(null, auth);
-			// console.log(res);
+			if (!result || !result.user) throw Error('Something went wrong logging in.');
 		} catch (err) {
 			error = err;
 			console.log(err);
 			setLogin(true);
-			// handle error - TODO
-			/** errors look like this
-			 * {
-					"error": {
-						"code": 400,
-						"message": "INVALID_EMAIL",
-						"errors": [
-						{
-							"message": "INVALID_EMAIL",
-							"domain": "global",
-							"reason": "invalid"
-						}
-						]
-					}
-				}
-			 */
 		}
 
-		// if successful, pull data from firebase - eddie your stuff goes here
-		//console.log(error);
+		// if successful, pull data from firebase
 		if (!error) {
 			const user = await getTherapistInfo(null,auth);
-			console.log(user)
 			var status=user.data.code;
 
 			// gets from firebase and stores in redux the client statistics
@@ -148,32 +64,44 @@ export default function Login() {
 			storeClientList(dispatch);
 
 			// if we did not get a user, call signOut() and don't log the user in
-			// eddie you might have to change this conditional depending on what the return for not finding a user is
-			if (status==500) {
+			if (status===500) {
 				// sign out of firebase auth
 				await signOut(auth);
 			} else {
-				console.log('tried to log in');
 				// send dispatch to redux
 				dispatch({
 					type: 'LOG_IN',
 					payload: {
 						id: auth.currentUser.uid,
-						data: user
+						data: user.data.data
 					}
 				});
 			}
 		}
+		setLoading(false);
 	}
-	// if user is logged in redirect to homepage
-	if (userData && userData.loggedIn) return <Redirect to='/home'/>;
 
-	
+	// if user is logged in redirect to homepage
+	if (userData.data) return <Redirect to='/home'/>;
+
+	if (loading) {
+		return (
+			<Grid
+				container
+				spacing={0}
+				direction="column"
+				alignItems="center"
+				justifyContent="center"
+				style={{ minHeight: '100vh' }}
+			>
+				<CircularProgress/>
+			</Grid>
+		);
+	}
 
 	return (
 		<>
 			<h1>Log In</h1>
-			{/* <button onClick={createUser}>Create Test User</button> */}
 			<form id='login-form' onSubmit={logUserIn}>
 				<TextField id='email' label='Email' variant='outlined' />
 				<TextField id='password' label='Password' variant='outlined' type='password' />

@@ -1,46 +1,59 @@
-import React from 'react';
-import { useSelector, useDispatch } from "react-redux";
+import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from "react-redux";
 import { Redirect } from 'react-router-dom';
-import { makeStyles } from '@material-ui/core/styles';
-import { Box, Grid, Paper, Avatar } from '@material-ui/core';
+import { Avatar, Box, CircularProgress, Grid } from '@material-ui/core';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import PeopleIcon from '@mui/icons-material/People';
-import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 import TrendingDownIcon from '@mui/icons-material/TrendingDown';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import Button from '@mui/material/Button';
 import ArrowRightAlt from '@mui/icons-material/ArrowRightAlt';
-
-import {auth, getClientsList} from '../../firebase/Firebase';
-//import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
+import { storeClientList, storeClientStatistics, storeUser } from '../../firebase/fetchData';
 
 function Home () {
-	// redirect to / if not logged in
+	const [loading, setLoading] = useState(true); 
+	// pull data from redux store
 	const userData = useSelector((state) => state.user);
-	console.log(userData);
-
 	const clientsStatisticsData = useSelector((state) => state.clientStatistics);
-	console.log(clientsStatisticsData);
-
 	const clientListData = useSelector((state) => state.clientsList);
-	console.log(clientListData);
+	const dispatch = useDispatch();
+	// refetch data from firebase and store in redux
+	useEffect(() => {
+		storeClientList(dispatch);
+		storeClientStatistics(dispatch);
+		storeUser(dispatch);
+		setLoading(false);
+	}, []);
+
+	// redirect to / if not logged in
+	if (!userData.data) return <Redirect to='/'/>;
+
+	if (loading) {
+		return (
+			<Grid
+				container
+				spacing={0}
+				direction="column"
+				alignItems="center"
+				justifyContent="center"
+				style={{ minHeight: '100vh' }}
+			>
+				<CircularProgress/>
+			</Grid>
+		);
+	}
+
 	let clients;
 	if (clientListData && clientListData.clients) ({clients} = clientListData);
 	else clients = {};
 
-	if (!userData.loggedIn) return <Redirect to='/'/>;
+	let activeTodayClientsInfo = userData.data.numActiveClients;
+	let activeClientsInfo = 0;
+	if (userData && userData.data && userData.data.clients) activeClientsInfo = userData.data.clients.length;
 
-	let activeClientsInfo = userData.data.data.data.clients.length;
-	// testing to make sure auth will work across pages
-	const testFN = async () => {
-		const res = await getClientsList(null, auth);
-	}
-
-	testFN();
-	
 	return(
 		<div>
-			<ClientOverview activeClients={activeClientsInfo}/>
+			<ClientOverview activeToday={activeTodayClientsInfo} activeClients={activeClientsInfo}/>
 			<ClientGrid clientList={clients} clientStats={clientsStatisticsData}></ClientGrid>
 		</div>
 	);	   
@@ -48,6 +61,7 @@ function Home () {
 
 function ClientOverview(props)
 {
+	let activeToday = props.activeToday;
 	let activeClients = props.activeClients
 	return (
 		<div style={{ width: '70%', borderBottom: '1px solid gray', marginBottom: "10px"}}>
@@ -58,7 +72,7 @@ function ClientOverview(props)
 						</h4>
 					</Grid>
 					<Grid item xs={6} sm={3}>
-						<PlayArrowIcon fontSize="small"></PlayArrowIcon>3 Active Today
+						<PlayArrowIcon fontSize="small"></PlayArrowIcon>{activeToday} Active Today
 					</Grid>
 					<Grid item xs={6} sm={3}>
 						<PeopleIcon fontSize="small"></PeopleIcon>{activeClients} Active Clients
@@ -71,11 +85,16 @@ function ClientOverview(props)
 
 function ClientRow(props)
 {
+	let groundingAllTime = 0;
+	if (props && props.stats && props.stats.groundingActivations) groundingAllTime = props.stats.groundingActivations.allTime;
+	let symptomsAllTime = 0;
+	if (props && props.stats && props.stats.symptomReports) symptomsAllTime = props.stats.symptomReports.allTime;
 	const info = {
 		clientName: props.name,
+		email: props.stats.email,
 		id: props.id,
-		groundingActivations: props.groundingActivations || 0,
-		symptomReports: props.symptomReports || 0
+		groundingActivations: groundingAllTime || 0,
+		symptomReports: symptomsAllTime || 0
 	};
 
 	return (
@@ -87,7 +106,7 @@ function ClientRow(props)
 					</Grid>
 					<Grid item xs={9}>
 						<h3 className="name">{info.clientName}</h3>
-						<h4 className="age">Age: 42</h4>
+						<h4 className="email">{info.email.length <= 20 ? info.email : info.email.substring(0, 18) + "..."}</h4>
 					</Grid>
 				</Grid>
 			</Grid>
@@ -134,6 +153,10 @@ function ClientGrid(props)
 	for (let index=0; index < clientIDs.length; index++) {
 		const id = clientIDs[index];
 		const name = clientList[id];
+		// prevent crash on undefined
+		if (!clientStats || !clientStats.idObjects) {
+			break;
+		}
 		const stat = clientStats.idObjects[id];
 		// prevent crash of trying to read data of null
 		if (stat === null || stat === undefined) {
@@ -141,7 +164,7 @@ function ClientGrid(props)
 		}
 		clientInfoList.push(
 			<div className="individualRow">
-				<ClientRow id={id} name={name} groundingActivations={stat.groundingActivations.allTime} symptomReports={stat.symptomReports.allTime}></ClientRow>
+				<ClientRow id={id} name={name} stats={stat}></ClientRow>
 			</div>
 		)
 	}
