@@ -85,16 +85,25 @@ function ClientOverview(props)
 
 function ClientRow(props)
 {
-	let groundingAllTime = 0;
-	if (props && props.stats && props.stats.groundingActivations) groundingAllTime = props.stats.groundingActivations.allTime;
-	let symptomsAllTime = 0;
-	if (props && props.stats && props.stats.symptomReports) symptomsAllTime = props.stats.symptomReports.allTime;
+	let groundingLastWeek, groundingPercentChange, symptomsLastWeek, symptomsPercentChange = 0;
+	if (props && props.stats && props.stats.groundingActivations) 
+	{
+		groundingLastWeek = props.stats.groundingActivations.lastWeek;
+		groundingPercentChange = props.stats.groundingActivations.percentChange;
+	}
+	if (props && props.stats && props.stats.symptomReports) 
+	{
+		symptomsLastWeek = props.stats.symptomReports.lastWeek;
+		symptomsPercentChange = props.stats.symptomReports.percentChange;
+	}
 	const info = {
 		clientName: props.name,
 		email: props.stats.email,
 		id: props.id,
-		groundingActivations: groundingAllTime || 0,
-		symptomReports: symptomsAllTime || 0
+		groundingActivations: groundingLastWeek,
+		groundingPercent: groundingPercentChange,
+		symptomReports: symptomsLastWeek,
+		symptomsPercent: symptomsPercentChange
 	};
 
 	return (
@@ -113,27 +122,36 @@ function ClientRow(props)
 			<Grid item xs={3}>
 				<Grid container spacing={0}>
 					<Grid item xs={2}>
-						<TrendingDownIcon fontSize="large"></TrendingDownIcon>
-					</Grid>
-					<Grid item xs={2}>
 						<h3>{info.symptomReports}</h3>
 					</Grid>
-					<Grid item xs={8}>
+					<Grid item xs={6}>
 						<h4>Symptom Scores</h4>
 					</Grid>
 				</Grid>
-				
+				<Grid container spacing={0}>
+					<Grid item xs={2}>
+						{info.symptomPercent > 0 ? <TrendingUpIcon/> : <TrendingDownIcon/>}
+					</Grid>
+					<Grid item xs={2}>
+						<h4 className="percentChange">{info.symptomsPercent}%</h4>
+					</Grid>
+				</Grid>
 			</Grid>
 			<Grid item xs={3}>
 				<Grid container spacing={0}>
 					<Grid item xs={2}>
-						<TrendingUpIcon fontSize="large"></TrendingUpIcon>
-					</Grid>
-					<Grid item xs={2}>
 						<h3>{info.groundingActivations}</h3>
 					</Grid>
-					<Grid item xs={8}>
+					<Grid item xs={6}>
 						<h4 style={{marginLeft: '15px'}}>Grounding Activations</h4>
+					</Grid>
+				</Grid>
+				<Grid container spacing={0}>
+					<Grid item xs={2}>
+						{info.groundingPercent > 0 ? <TrendingUpIcon/> : <TrendingDownIcon/>}
+					</Grid>
+					<Grid item xs={2}>
+						<h4 className="percentChange">{info.groundingPercent}%</h4>
 					</Grid>
 				</Grid>
 			</Grid>
