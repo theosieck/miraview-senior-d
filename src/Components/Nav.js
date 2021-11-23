@@ -5,7 +5,6 @@ import { useDispatch } from 'react-redux';
 import { signOut } from 'firebase/auth';
 import logo from './MiraLogo_1000px.png';
 import { auth } from '../firebase/Firebase';
-import { logout } from '../slices/userSlice';
 
 const useStyles = makeStyles({
     tab: {

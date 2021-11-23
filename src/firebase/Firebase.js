@@ -1,5 +1,5 @@
 import { initializeApp } from 'firebase/app';
-import { getAuth, onAuthStateChanged } from 'firebase/auth';
+import { getAuth } from 'firebase/auth';
 import { getFunctions, httpsCallable } from 'firebase/functions';
 
 // add our api keys
@@ -27,7 +27,8 @@ const getClientsList = httpsCallable(firebaseFunctions, 'getClientsList');
 const getClientStatistics = httpsCallable(firebaseFunctions, 'getClientStatistics');
 const getSingleClient = httpsCallable(firebaseFunctions, 'getSingleClient');
 const updateTherapist = httpsCallable(firebaseFunctions, 'updateTherapist');
-const getTherapistInfo=httpsCallable(firebaseFunctions,'getTherapistInfo');
+const getTherapistInfo=httpsCallable(firebaseFunctions,'getTherapistInfo')
+const editClientInfo=httpsCallable(firebaseFunctions,'editClientInfo');
 const findClient = httpsCallable(firebaseFunctions, 'findClient');
 
 /* Call functions like this:
@@ -44,11 +45,6 @@ getClientsList().then((result) => {
 });
 */
 
-// detect auth state - TODO
-// onAuthStateChanged(auth, (user) => {
-
-// })
-
 export default firebaseApp;
 export {auth};
-export { addTherapist, getClientsList, getClientStatistics, getSingleClient, updateTherapist,getTherapistInfo, findClient };
+export { addTherapist, getClientsList, getClientStatistics, getSingleClient, updateTherapist,getTherapistInfo,editClientInfo,findClient };

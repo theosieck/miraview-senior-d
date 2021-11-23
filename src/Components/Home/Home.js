@@ -1,19 +1,17 @@
-import React, { useEffect } from 'react';
-import { useSelector, useDispatch } from "react-redux";
+import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from "react-redux";
 import { Redirect } from 'react-router-dom';
-import { makeStyles } from '@material-ui/core/styles';
-import { Box, Grid, Paper, Avatar } from '@material-ui/core';
+import { Avatar, Box, CircularProgress, Grid } from '@material-ui/core';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import PeopleIcon from '@mui/icons-material/People';
-import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
 import TrendingDownIcon from '@mui/icons-material/TrendingDown';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import Button from '@mui/material/Button';
 import ArrowRightAlt from '@mui/icons-material/ArrowRightAlt';
-import {auth} from '../../firebase/Firebase';
-import { storeClientList, storeClientStatistics } from '../../firebase/fetchData';
+import { storeClientList, storeClientStatistics, storeUser } from '../../firebase/fetchData';
 
 function Home () {
+	const [loading, setLoading] = useState(true); 
 	// pull data from redux store
 	const userData = useSelector((state) => state.user);
 	const clientsStatisticsData = useSelector((state) => state.clientStatistics);
@@ -23,17 +21,35 @@ function Home () {
 	useEffect(() => {
 		storeClientList(dispatch);
 		storeClientStatistics(dispatch);
+		storeUser(dispatch);
+		setLoading(false);
 	}, []);
+
 	// redirect to / if not logged in
 	if (!userData.data) return <Redirect to='/'/>;
+
+	if (loading) {
+		return (
+			<Grid
+				container
+				spacing={0}
+				direction="column"
+				alignItems="center"
+				justifyContent="center"
+				style={{ minHeight: '100vh' }}
+			>
+				<CircularProgress/>
+			</Grid>
+		);
+	}
+
 	let clients;
 	if (clientListData && clientListData.clients) ({clients} = clientListData);
 	else clients = {};
 
-	if (!userData.data) return <Redirect to='/'/>;
-
-	let activeTodayClientsInfo = userData.data.data.data.numActiveClients;
-	let activeClientsInfo = userData.data.data.data.clients.length;
+	let activeTodayClientsInfo = userData.data.numActiveClients;
+	let activeClientsInfo = 0;
+	if (userData && userData.data && userData.data.clients) activeClientsInfo = userData.data.clients.length;
 
 	return(
 		<div>
@@ -69,12 +85,25 @@ function ClientOverview(props)
 
 function ClientRow(props)
 {
+	let groundingLastWeek, groundingPercentChange, symptomsLastWeek, symptomsPercentChange = 0;
+	if (props && props.stats && props.stats.groundingActivations) 
+	{
+		groundingLastWeek = props.stats.groundingActivations.lastWeek;
+		groundingPercentChange = props.stats.groundingActivations.percentChange;
+	}
+	if (props && props.stats && props.stats.symptomReports) 
+	{
+		symptomsLastWeek = props.stats.symptomReports.lastWeek;
+		symptomsPercentChange = props.stats.symptomReports.percentChange;
+	}
 	const info = {
 		clientName: props.name,
 		email: props.stats.email,
 		id: props.id,
-		groundingActivations: props.stats.groundingActivations.allTime || 0,
-		symptomReports: props.stats.symptomReports.allTime || 0
+		groundingActivations: groundingLastWeek,
+		groundingPercent: groundingPercentChange,
+		symptomReports: symptomsLastWeek,
+		symptomsPercent: symptomsPercentChange
 	};
 
 	return (
@@ -93,27 +122,36 @@ function ClientRow(props)
 			<Grid item xs={3}>
 				<Grid container spacing={0}>
 					<Grid item xs={2}>
-						<TrendingDownIcon fontSize="large"></TrendingDownIcon>
-					</Grid>
-					<Grid item xs={2}>
 						<h3>{info.symptomReports}</h3>
 					</Grid>
-					<Grid item xs={8}>
+					<Grid item xs={6}>
 						<h4>Symptom Scores</h4>
 					</Grid>
 				</Grid>
-				
+				<Grid container spacing={0}>
+					<Grid item xs={2}>
+						{info.symptomPercent > 0 ? <TrendingUpIcon/> : <TrendingDownIcon/>}
+					</Grid>
+					<Grid item xs={2}>
+						<h4 className="percentChange">{info.symptomsPercent}%</h4>
+					</Grid>
+				</Grid>
 			</Grid>
 			<Grid item xs={3}>
 				<Grid container spacing={0}>
 					<Grid item xs={2}>
-						<TrendingUpIcon fontSize="large"></TrendingUpIcon>
-					</Grid>
-					<Grid item xs={2}>
 						<h3>{info.groundingActivations}</h3>
 					</Grid>
-					<Grid item xs={8}>
+					<Grid item xs={6}>
 						<h4 style={{marginLeft: '15px'}}>Grounding Activations</h4>
+					</Grid>
+				</Grid>
+				<Grid container spacing={0}>
+					<Grid item xs={2}>
+						{info.groundingPercent > 0 ? <TrendingUpIcon/> : <TrendingDownIcon/>}
+					</Grid>
+					<Grid item xs={2}>
+						<h4 className="percentChange">{info.groundingPercent}%</h4>
 					</Grid>
 				</Grid>
 			</Grid>

@@ -9,9 +9,15 @@
     margin-block-end: 0;
 }
 
-.email
+.email, .percentChange
 {
     margin-block-start: 0;
+}
+
+.percentChange
+{
+    color: gray;
+    margin-block-end: 10px;
 }
 
 .verticalCenter
