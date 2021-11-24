@@ -85,6 +85,7 @@ function ClientOverview(props)
 
 function ClientRow(props)
 {
+	const dispatch = useDispatch();
 	let groundingLastWeek, groundingPercentChange, symptomsLastWeek, symptomsPercentChange = 0;
 	if (props && props.stats && props.stats.groundingActivations) 
 	{
@@ -156,7 +157,13 @@ function ClientRow(props)
 				</Grid>
 			</Grid>
 			<Grid item xs={3}>
-				<Button variant="contained">View Patient Data<ArrowRightAlt></ArrowRightAlt></Button>
+				<Button variant="contained" onClick={() => {
+					dispatch({
+						type: 'SET_CLIENT',
+						payload: info.id
+					});
+					window.location.href='/client-data';
+				}}>View Patient Data<ArrowRightAlt></ArrowRightAlt></Button>
 			</Grid>
 		</Grid>
 	);
