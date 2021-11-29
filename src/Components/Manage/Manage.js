@@ -1,4 +1,4 @@
-import React, {useState, useRef} from 'react';
+import React, {useState, useRef, useEffect} from 'react';
 import { useSelector, useDispatch } from "react-redux";
 import { Redirect } from 'react-router-dom';
 import { auth } from '../../firebase/Firebase';
@@ -66,9 +66,16 @@ function Profile (props) {
 	const[isActive,setIsActive]=useState(false);
 	const onClick =() => setIsActive(!isActive);
 	const clientData = useSelector((state) => state.singleClient);
+	// const dispatch = useDispatch();
 
 	// when a name in list is clicked, get that client's data and store it in redux
-	storeSingleClient(useDispatch(), props.id);
+	// useEffect(() => {
+	// 	function storeData() {
+	// storeSingleClient(dispatch(), props.id);
+	// 	}
+
+	// 	storeData();
+	// }, [props.id]);
 
 	let clientInfo = {};
 	if (clientData && clientData.data)
@@ -270,6 +277,7 @@ function ClientList(props) {
 	const [clients, addClient] = useState(props.data);
 	const [clientFocused, showClientProfile] = useState(null);
 	const [selectedIndex, setSelectedClient] = useState(null);
+	const dispatch = useDispatch();
 
 	const listClients = [];
 	const clientIDs = Object.keys(clients);
@@ -294,6 +302,7 @@ function ClientList(props) {
 	
 	function handleClientListClick(id, name) {
 		setSelectedClient(id);
+		storeSingleClient(dispatch, id);
 		showClientProfile(<Profile id={id} name={name} />);
 	}
 
