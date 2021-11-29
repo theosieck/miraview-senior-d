@@ -240,7 +240,7 @@ function Profile (props) {
 												/>
 											
 											</DialogContent>
-											{email && <Alert severity="error">Enter email with correct format!</Alert>}
+											{email && <Alert severity="error">Please enter a valid email address</Alert>}
 											<DialogActions>
 												<Button onClick={handleClose}>Cancel</Button>
 												<Button onClick={editUserInfo}>Submit</Button>
