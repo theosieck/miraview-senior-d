@@ -66,7 +66,7 @@ function Profile (props) {
 	const[isActive,setIsActive]=useState(false);
 	const onClick =() => setIsActive(!isActive);
 	const clientData = useSelector((state) => state.singleClient);
-	// const dispatch = useDispatch();
+	const dispatch = useDispatch();
 
 	// when a name in list is clicked, get that client's data and store it in redux
 	// useEffect(() => {
@@ -122,8 +122,17 @@ function Profile (props) {
 			let re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
 			if(!data.secondaryemail || re.test(data.secondaryemail)){
 				setOpen(false);
+				// save current uid
+				data.uid = props.id;
+				// edit in firebase
+				console.log(data);
 				const edit=await editClientInfo(data,auth);
+				// edit in redux
+				console.log(props.id);
+				storeSingleClient(dispatch, props.id);
 				console.log(edit);
+				// reset data
+				setData({uid:'',lastname:'',gender:'',sex:'',secondaryemail:'',phonenumber:'',phonetype:''});
 			}
 			else {
 				setEmail(true);
