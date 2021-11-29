@@ -1,5 +1,7 @@
 const initialState = {
-	id: null
+	id: null,
+	name: null,
+	email: null
 }
 
 const clientToUseReducer = (state=initialState, action) => {
@@ -9,7 +11,9 @@ const clientToUseReducer = (state=initialState, action) => {
 		case 'SET_CLIENT':
 			return {
 				...state,
-				id: payload
+				id: payload.id,
+				name: payload.name,
+				email: payload.email
 			};
 		default:
 			return state;

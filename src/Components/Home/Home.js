@@ -160,7 +160,11 @@ function ClientRow(props)
 				<Button variant="contained" onClick={() => {
 					dispatch({
 						type: 'SET_CLIENT',
-						payload: info.id
+						payload: {
+							id: info.id,
+							name: info.clientName,
+							email: info.email
+						}
 					});
 					window.location.href='/client-data';
 				}}>View Patient Data<ArrowRightAlt></ArrowRightAlt></Button>
