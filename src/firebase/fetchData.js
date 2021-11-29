@@ -74,7 +74,7 @@ const storeSingleClient = async (dispatch, clientID) => {
 	} catch (e) {
 		console.log(e);
 		alert(e.toString());
-		return;
+		// return;
 	}
 
 	dispatch({
