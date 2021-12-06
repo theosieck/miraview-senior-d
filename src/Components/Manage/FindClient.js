@@ -3,6 +3,7 @@ import { findClient, updateTherapist, auth } from "../../firebase/Firebase";
 import { Button, TextField, CircularProgress } from '@mui/material';
 import { useSelector, useDispatch } from "react-redux";
 import Alert from '@material-ui/lab/Alert';
+import { storeClientStatistics } from "../../firebase/fetchData";
 
 export default function FindClient (props) {
 	const userData = useSelector((state) => state.user);
@@ -91,6 +92,9 @@ export default function FindClient (props) {
 			setLoading(false);
 			return;
 		}
+
+		// refetch client stats
+		await storeClientStatistics(dispatch);
 
 		// add client to redux store
 		clientListData.clients[clientID] = clientFound.name;
