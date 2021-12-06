@@ -27,21 +27,21 @@ const formatData = (dataToFormat) =>
 	return sortedKeys;
 }
 
-const PLC5Chart = (retrievedInfo, width) => {
-	let plc5Obj = {};
+const PCL5Chart = (retrievedInfo, width) => {
+	let pcl5Obj = {};
 
-	retrievedInfo && retrievedInfo.PLC5 ? Object.keys(retrievedInfo.PLC5).forEach((key)=>
+	retrievedInfo && retrievedInfo.PCL5 ? Object.keys(retrievedInfo.PCL5).forEach((key)=>
 	{
-		let sortedKeys = formatData(retrievedInfo.PLC5[key]);
+		let sortedKeys = formatData(retrievedInfo.PCL5[key]);
 		let data = [];
 		sortedKeys.forEach((sortkey) =>
 		{
-			let index = retrievedInfo.PLC5[key].findIndex((obj) => new Date(Object.keys(obj)[0]).getTime() === new Date(sortkey).getTime());
+			let index = retrievedInfo.PCL5[key].findIndex((obj) => new Date(Object.keys(obj)[0]).getTime() === new Date(sortkey).getTime());
 
-			data.push({x: new Date(sortkey), y: Object.values(retrievedInfo.PLC5[key][index])[0]});
+			data.push({x: new Date(sortkey), y: Object.values(retrievedInfo.PCL5[key][index])[0]});
 		});
-		plc5Obj[key] = data;
-	}) : plc5Obj = {};
+		pcl5Obj[key] = data;
+	}) : pcl5Obj = {};
 
 	return (
 	<XYPlot xType="time" stackBy="y" width={width} height={200}>
@@ -52,25 +52,25 @@ const PLC5Chart = (retrievedInfo, width) => {
 	<AreaSeries
 	  className="area-series-example"
 	  curve="curveLinear"
-	  data={plc5Obj.Intrusion}
+	  data={pcl5Obj.Intrusion}
 	  color="#FF6ED2EC"
 	/>
 	<AreaSeries
 	  className="area-series-example"
 	  curve="curveLinear"
-	  data={plc5Obj.Avoidance}
+	  data={pcl5Obj.Avoidance}
 	  color="#FF2D68DB"
 	/>
 	<AreaSeries
 	  className="area-series-example"
 	  curve="curveLinear"
-	  data={plc5Obj.NegativeFeelings}
+	  data={pcl5Obj.NegativeFeelings}
 	  color="#FFB777FF"
 	/>
 	<AreaSeries
 	  className="area-series-example"
 	  curve="curveLinear"
-	  data={plc5Obj.Hyperarousal}
+	  data={pcl5Obj.Hyperarousal}
 	  color="#FFF976FE"
 	/>
   </XYPlot>);
@@ -192,7 +192,7 @@ export default function SingleClientData() {
 	const getTrackedSymptoms = (retrievedInfo) =>
 	{
 		let allReturned = Object.keys(retrievedInfo);
-		let pclIndex = allReturned.indexOf('PLC5');
+		let pclIndex = allReturned.indexOf('PCL5');
 		allReturned.splice(pclIndex, 1);
 		let triggerIndex = allReturned.indexOf('Triggers');
 		allReturned.splice(triggerIndex, 1);
@@ -236,7 +236,7 @@ export default function SingleClientData() {
 				<Grid container spacing={2} xs={12}>
 					<Grid item ref={sizingElement} container spacing={1} xs={10}>
 						<Grid item xs={6}>
-							{PLC5Chart(retrievedInfo, width)}
+							{PCL5Chart(retrievedInfo, width)}
 						</Grid>
 						<Grid item xs={6}>
 							<BuildPlot retrievedInfo={retrievedInfo} trackedItem={selected} timePeriod={alignment} width={width}></BuildPlot>
