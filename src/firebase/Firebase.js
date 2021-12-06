@@ -26,6 +26,7 @@ const addTherapist = httpsCallable(firebaseFunctions, 'addTherapist');
 const getClientsList = httpsCallable(firebaseFunctions, 'getClientsList');
 const getClientStatistics = httpsCallable(firebaseFunctions, 'getClientStatistics');
 const getSingleClient = httpsCallable(firebaseFunctions, 'getSingleClient');
+const getClientData = httpsCallable(firebaseFunctions, 'getClientData');
 const updateTherapist = httpsCallable(firebaseFunctions, 'updateTherapist');
 const getTherapistInfo=httpsCallable(firebaseFunctions,'getTherapistInfo')
 const editClientInfo=httpsCallable(firebaseFunctions,'editClientInfo');
@@ -47,4 +48,4 @@ getClientsList().then((result) => {
 
 export default firebaseApp;
 export {auth};
-export { addTherapist, getClientsList, getClientStatistics, getSingleClient, updateTherapist,getTherapistInfo,editClientInfo,findClient };
+export { addTherapist, getClientsList, getClientStatistics, getSingleClient, getClientData, updateTherapist,getTherapistInfo,editClientInfo,findClient };

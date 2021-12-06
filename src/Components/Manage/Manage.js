@@ -59,7 +59,6 @@ function stringAvatar(name) {
 
 function Profile (props) {
 	/*
-
 	const dropdownRef=useRef(null);
 	//const [isActive,setIsActive]=useDetectOutsideClick(dropdownRef,false);
 	*/

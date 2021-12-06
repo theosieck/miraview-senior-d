@@ -1,13 +1,171 @@
-import React, { useState } from 'react';
+import React, { useState, useLayoutEffect, useEffect } from 'react';
 import { useSelector } from "react-redux";
 import { Redirect } from "react-router-dom";
+import { auth } from '../../firebase/Firebase';
 import { Avatar, Grid } from "@material-ui/core";
-import { Divider, Stack, ToggleButton, ToggleButtonGroup } from "@mui/material";
+import { Button, Divider, Stack, ToggleButton, ToggleButtonGroup } from "@mui/material";
+import {XYPlot, AreaSeries, LineSeries, LineMarkSeries, XAxis, YAxis, VerticalGridLines, HorizontalGridLines, CircularGridLines} from 'react-vis';
+import { getClientData } from '../../firebase/Firebase';
+const d3 = require('d3');
+
+const createDateString = (value) =>
+{
+	let t = new Date(0);
+	t.setSeconds(value/1000);
+	let arr = t.toDateString().split(' ');
+	let formatStr = arr[2] + '-' + arr[1] + '-' + arr[3].substring(2);
+	return formatStr;
+}
+
+const formatData = (dataToFormat) =>
+{
+	//because react-vis requires sorted data
+	let objs = Object.values(dataToFormat);
+	let dates = [];
+	objs.forEach((x)=> dates.push(new Date(Object.keys(x)[0])));
+	let sortedKeys = dates.sort((a,b) => a - b );
+	return sortedKeys;
+}
+
+const PLC5Chart = (retrievedInfo, width) => {
+	let plc5Obj = {};
+
+	retrievedInfo && retrievedInfo.PLC5 ? Object.keys(retrievedInfo.PLC5).forEach((key)=>
+	{
+		let sortedKeys = formatData(retrievedInfo.PLC5[key]);
+		let data = [];
+		sortedKeys.forEach((sortkey) =>
+		{
+			let index = retrievedInfo.PLC5[key].findIndex((obj) => new Date(Object.keys(obj)[0]).getTime() === new Date(sortkey).getTime());
+
+			data.push({x: new Date(sortkey), y: Object.values(retrievedInfo.PLC5[key][index])[0]});
+		});
+		plc5Obj[key] = data;
+	}) : plc5Obj = {};
+
+	return (
+	<XYPlot xType="time" stackBy="y" width={width} height={200}>
+	<VerticalGridLines />
+	<HorizontalGridLines />
+	<XAxis tickLabelAngle={-45} tickFormat={v => createDateString(v)}/>
+	<YAxis/>
+	<AreaSeries
+	  className="area-series-example"
+	  curve="curveLinear"
+	  data={plc5Obj.Intrusion}
+	  color="#FF6ED2EC"
+	/>
+	<AreaSeries
+	  className="area-series-example"
+	  curve="curveLinear"
+	  data={plc5Obj.Avoidance}
+	  color="#FF2D68DB"
+	/>
+	<AreaSeries
+	  className="area-series-example"
+	  curve="curveLinear"
+	  data={plc5Obj.NegativeFeelings}
+	  color="#FFB777FF"
+	/>
+	<AreaSeries
+	  className="area-series-example"
+	  curve="curveLinear"
+	  data={plc5Obj.Hyperarousal}
+	  color="#FFF976FE"
+	/>
+  </XYPlot>);
+}
+
+function BuildPlot(props)
+{
+	let {
+		retrievedInfo,
+		trackedItem,
+		timePeriod,
+		width
+	} = props;
+
+	let retData = [];
+	let retPastData = []
+
+	if (!retrievedInfo) return <p>Awaiting Data</p>
+	let categories = Object.keys(retrievedInfo);
+	if (!categories.includes(trackedItem)) console.log('ERROR, cannot track %s', trackedItem);
+	else
+	{
+		let info = retrievedInfo[trackedItem];
+		let availableTimePeriods = Object.keys(info);
+		if (!availableTimePeriods.includes(timePeriod)) console.log('ERROR, cannot track %s at time period %s', trackedItem, timePeriod);
+		else
+		{
+			let unsorted = info[timePeriod];
+			//let unsortedPast = info[timePeriod+"PriorPeriod"];
+			let sortedKeys = formatData(unsorted);
+			//let sortedPastKeys = formatData(unsortedPast)
+			sortedKeys.forEach((sortkey)=>
+			{
+				let index = unsorted.findIndex((obj) => new Date(Object.keys(obj)[0]).getTime() === new Date(sortkey).getTime());
+				retData.push({x: new Date(sortkey), y: Object.values(unsorted[index])[0]});
+			});
+			// sortedPastKeys.forEach((sortkey) =>
+			// {
+			// 	let index = unsortedPast.findIndex((obj) => new Date(Object.keys(obj)[0]).getTime() === new Date(sortkey).getTime());
+			// 	let date = new Date(sortkey);
+			// 	date.setDate(date.getDate() + 7);
+			// 	retPastData.push({x: date, y: Object.values(unsortedPast[index])[0]});
+			// })
+
+		}
+	}
+
+	return (
+		<XYPlot width={width} height={200} style={{maxWidth: 'inherit'}}>
+			<VerticalGridLines />
+			<HorizontalGridLines />
+			<XAxis tickLabelAngle={-45} tickFormat={v => createDateString(v)}/>
+			<YAxis/>
+			<LineSeries curve="curveLinear" data={retData} style={{fill: 'none'}}></LineSeries>
+		</XYPlot>
+	)
+}
 
 export default function SingleClientData() {
-	const [alignment, setAlignment] = React.useState('7 Days');
+	const [alignment, setAlignment] = React.useState('7days');
+	const [selected, setSelected] = useState('Hypervigilance')
+	const [retrievedInfo, setRetrievedInfo] = useState(undefined);
+	const [width, setWidth] = useState(200);
 	const userData = useSelector((state) => state.user);
 	const clientToUse = useSelector((state) => state.clientToUse);
+	let sizingElement = React.createRef();
+
+	useEffect(() => 
+	{
+		async function getInfo()
+		{
+			const {data} = await getClientData(clientToUse, auth);
+			setRetrievedInfo(data.data);
+		}
+		getInfo(clientToUse);
+	}, []);
+
+	useLayoutEffect(() =>
+	{
+		function handleResize()
+		{
+			if (sizingElement && sizingElement.current)
+			{
+				setWidth(sizingElement.current.offsetWidth/2)
+			}
+			else
+			{
+				setWidth(window.innerWidth*.375)
+			}
+		}
+		window.addEventListener('resize', handleResize);
+		handleResize();
+		return () => window.removeEventListener('resize', handleResize);
+	}, [sizingElement])
+
 	// redirect to / if not logged in
 	if (!userData.data) return <Redirect to='/'/>;
 
@@ -24,7 +182,30 @@ export default function SingleClientData() {
 
 	const handleAlignment = (event, newAlignment) => {
 		setAlignment(newAlignment);
-	  };
+	};
+
+	const handleSelected = (event, newSelected) =>
+	{
+		setSelected(newSelected);
+	}
+
+	const getTrackedSymptoms = (retrievedInfo) =>
+	{
+		let allReturned = Object.keys(retrievedInfo);
+		let pclIndex = allReturned.indexOf('PLC5');
+		allReturned.splice(pclIndex, 1);
+		let triggerIndex = allReturned.indexOf('Triggers');
+		allReturned.splice(triggerIndex, 1);
+		let groundingIndex = allReturned.indexOf('GroundingExercises');
+		allReturned.splice(groundingIndex, 1);
+		let returnVal = [];
+		allReturned.forEach((symptomCategory) =>
+		{
+			let stringVal = symptomCategory.split(/(?=[A-Z])/).join(' ');
+			returnVal.push(<ToggleButton value={symptomCategory}>{stringVal}</ToggleButton>);
+		});
+		return returnVal;
+	}
 
 	return (
 		<div>
@@ -44,14 +225,35 @@ export default function SingleClientData() {
 					<Grid item xs={1} sm={1} md={4} lg={5} xl={5}/>
 					<Grid item container xs={4} sm={5} md={3} lg={2} xl={2}>
 						<ToggleButtonGroup color="primary" value={alignment} exclusive onChange={handleAlignment}>
-							<ToggleButton value="7 Days">7 Days</ToggleButton>
-							<ToggleButton value="Last Week">Last Week</ToggleButton>
-							<ToggleButton value="24 Days">24 Days</ToggleButton>
+							<ToggleButton value="7days">7 Days</ToggleButton>
+							<ToggleButton value="1week">Last Week</ToggleButton>
+							<ToggleButton value="24days">24 Days</ToggleButton>
 						</ToggleButtonGroup>
 					</Grid>
 				</Grid>
 				<br/>
 				<Divider variant="middle" sx={{ borderBottomWidth: 3 }}/>
+				<Grid container spacing={2} xs={12}>
+					<Grid item ref={sizingElement} container spacing={1} xs={10}>
+						<Grid item xs={6}>
+							{PLC5Chart(retrievedInfo, width)}
+						</Grid>
+						<Grid item xs={6}>
+							<BuildPlot retrievedInfo={retrievedInfo} trackedItem={selected} timePeriod={alignment} width={width}></BuildPlot>
+						</Grid>
+						<Grid item xs={6}>
+							<BuildPlot retrievedInfo={retrievedInfo} trackedItem='Triggers' timePeriod={alignment} width={width}></BuildPlot>
+						</Grid>
+						<Grid item xs={6}>
+							<BuildPlot retrievedInfo={retrievedInfo} trackedItem='GroundingExercises' timePeriod={alignment} width={width}></BuildPlot>
+						</Grid>
+					</Grid>	
+					<Grid item xs={2}>
+						<ToggleButtonGroup orientation="vertical" exclusive value={selected} onChange={handleSelected}>
+							{retrievedInfo ? getTrackedSymptoms(retrievedInfo) : []}
+						</ToggleButtonGroup>
+					</Grid>
+				</Grid>
 			</div>
 		</div>
 	);
