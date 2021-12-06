@@ -65,6 +65,7 @@ function Profile (props) {
 	*/
 	const[isActive,setIsActive]=useState(false);
 	const onClick =() => setIsActive(!isActive);
+	const clientStatisticsData = useSelector((state) => state.clientStatistics);
 	const clientData = useSelector((state) => state.singleClient);
 	const dispatch = useDispatch();
 
@@ -78,9 +79,9 @@ function Profile (props) {
 	// }, [props.id]);
 
 	let clientInfo = {};
-	if (clientData && clientData.data)
+	if (clientData && clientData.data && clientStatisticsData)
 	{
-		//clientInfo.email ??
+		clientInfo.email = clientStatisticsData.idObjects[props.id].email || 'N/A'; //?
 		clientInfo.lastName = clientData.data.lastname || 'N/A';
 		clientInfo.sex = clientData.data.sex || 'N/A';
 		clientInfo.gender = clientData.data.gender || 'N/A';
@@ -115,7 +116,7 @@ function Profile (props) {
 		
 	
 
-	//calls the API to updat the user info 
+	//calls the API to update the user info 
 	const editUserInfo = async () => {
 		try {
 			//setIsActive(!isActive);
@@ -269,7 +270,7 @@ function Profile (props) {
 					<p><strong>Sex: </strong>{clientInfo.sex}</p>
 				</div>
 				<div>	
-					<p><strong>Email: </strong>ngattusohw@gmail.com</p>
+					<p><strong>Email: </strong>{clientInfo.email}</p>
 					<p><strong>Secondary Email: </strong>{clientInfo.secondEmail}</p>
 					<p><strong>Phone number: </strong>{clientInfo.phoneNumber}</p>
 					<p><strong>Phone Type: </strong>{clientInfo.phoneType}</p>
