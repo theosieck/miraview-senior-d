@@ -121,15 +121,9 @@ export default function Login() {
                 	<TextField style={{paddingBottom:10}} id="password" label='Password' placeholder='Enter password' type='password' variant="standard" fullWidth required/>
                 	<Button type='submit' color='primary' variant="contained" style={{margin:'8px 0'}} fullWidth>Login</Button>
 				</form>
+				{login && <Alert severity="error">Your login credentials could not be verified, please try again.</Alert>}
             </Paper>
         </Grid>
-			{/* <h1>Log In</h1>
-			<form id='login-form' onSubmit={logUserIn}>
-				<TextField id='email' label='Email' variant='outlined' />
-				<TextField id='password' label='Password' variant='outlined' type='password' />
-				<Button type='submit'>Login</Button>
-			</form>
-			{login && <Alert severity="error">Your login credentials could not be verified, please try again.</Alert>} */}
 			<p>Test therapist 1 info: email: testing@test.test, password: 1234test</p>
 			<p>Test therapist 2 info: email: test123@testing.test, password: test1234</p>
 		</>
