@@ -8,6 +8,8 @@ import TrendingDownIcon from '@mui/icons-material/TrendingDown';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import Button from '@mui/material/Button';
 import ArrowRightAlt from '@mui/icons-material/ArrowRightAlt';
+import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
+import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
 import { storeClientList, storeClientStatistics, storeUser } from '../../firebase/fetchData';
 
 function Home () {
@@ -131,10 +133,10 @@ function ClientRow(props)
 				</Grid>
 				<Grid container spacing={0}>
 					<Grid item xs={2}>
-						{info.symptomPercent > 0 ? <TrendingUpIcon/> : <TrendingDownIcon/>}
+						{info.symptomPercent > 0 ? <ArrowUpwardIcon/> : <ArrowDownwardIcon/>}
 					</Grid>
 					<Grid item xs={2}>
-						<h4 className="percentChange">{info.symptomsPercent}%</h4>
+						<h4 className="percentChange">{info.symptomsPercent < 0 ? info.symptomsPercent*-1 : info.symptomsPercent}%</h4>
 					</Grid>
 				</Grid>
 			</Grid>
@@ -149,10 +151,10 @@ function ClientRow(props)
 				</Grid>
 				<Grid container spacing={0}>
 					<Grid item xs={2}>
-						{info.groundingPercent > 0 ? <TrendingUpIcon/> : <TrendingDownIcon/>}
+						{info.groundingPercent > 0 ? <ArrowUpwardIcon/> : <ArrowDownwardIcon/>}
 					</Grid>
 					<Grid item xs={2}>
-						<h4 className="percentChange">{info.groundingPercent}%</h4>
+						<h4 className="percentChange">{info.groundingPercent < 0 ? info.groundingPercent*-1 : info.groundingPercent}%</h4>
 					</Grid>
 				</Grid>
 			</Grid>
