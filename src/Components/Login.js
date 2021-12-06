@@ -2,11 +2,13 @@
 import { useDispatch, useSelector } from "react-redux";
 import { Redirect } from 'react-router-dom';
 import { Button, CircularProgress, Grid, TextField } from '@mui/material';
+import { Avatar, Paper } from '@material-ui/core';
 import { signInWithEmailAndPassword, signOut } from 'firebase/auth';
 import { auth } from "../firebase/Firebase";
 import { useState } from "react";
 import { getTherapistInfo} from "../firebase/Firebase";
 import Alert from '@material-ui/lab/Alert';
+import logo from './MiraLogo_1000px.png';
 import { storeClientList, storeClientStatistics } from '../firebase/fetchData';
 
 export default function Login() {
@@ -101,13 +103,27 @@ export default function Login() {
 
 	return (
 		<>
-			<h1>Log In</h1>
-			<form id='login-form' onSubmit={logUserIn}>
-				<TextField id='email' label='Email' variant='outlined' />
-				<TextField id='password' label='Password' variant='outlined' type='password' />
-				<Button type='submit'>Login</Button>
-			</form>
-			{login && <Alert severity="error">Your login credentials could not be verified, please try again.</Alert>}
+		<Grid
+				container
+				spacing={0}
+				direction="column"
+				alignItems="center"
+				justifyContent="center"
+				style={{ minHeight: '65vh' }}
+		>
+            <Paper elevation={10} style={{padding:20,height:'50vh',width:280, margin:"20px auto"}}>
+                <Grid align='center'>
+                     <Avatar src={logo}/>
+                    <h2>Log In</h2>
+                </Grid>
+				<form id='login-form' onSubmit={logUserIn}>
+                	<TextField style={{paddingBottom:10}} id="email" label='Email' placeholder='Enter username' variant="standard" fullWidth required/>
+                	<TextField style={{paddingBottom:10}} id="password" label='Password' placeholder='Enter password' type='password' variant="standard" fullWidth required/>
+                	<Button type='submit' color='primary' variant="contained" style={{margin:'8px 0'}} fullWidth>Login</Button>
+				</form>
+				{login && <Alert severity="error">Your login credentials could not be verified, please try again.</Alert>}
+            </Paper>
+        </Grid>
 			<p>Test therapist 1 info: email: testing@test.test, password: 1234test</p>
 			<p>Test therapist 2 info: email: test123@testing.test, password: test1234</p>
 		</>
