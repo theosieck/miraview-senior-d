@@ -2,7 +2,7 @@ import React, {useState, useRef, useEffect} from 'react';
 import { useSelector, useDispatch } from "react-redux";
 import { Redirect } from 'react-router-dom';
 import { auth } from '../../firebase/Firebase';
-import {Button, TextField, Box, Grid, Card, Divider, CardHeader, Avatar, Typography, makeStyles} from "@material-ui/core"
+import {Button, TextField, CircularProgress, Box, Grid, Card, Divider, CardHeader, Avatar, Typography, makeStyles} from "@material-ui/core"
 import MoreVert from '@material-ui/icons/MoreVert'
 import {useDetectOutsideClick} from "./useDetectOutsideClick";
 import {List, ListItemButton, ListItemIcon, ListItemText} from '@mui/material'
@@ -67,6 +67,8 @@ function Profile (props) {
 	const onClick =() => setIsActive(!isActive);
 	const clientData = useSelector((state) => state.singleClient);
 	const dispatch = useDispatch();
+	const [loading, setLoading] = useState(true);
+	console.log(clientData);
 
 	// when a name in list is clicked, get that client's data and store it in redux
 	// useEffect(() => {
@@ -80,6 +82,7 @@ function Profile (props) {
 	let clientInfo = {};
 	if (clientData && clientData.data)
 	{
+		if (!loading && clientData.id!==props.id) setLoading(true);
 		//clientInfo.email ??
 		clientInfo.lastName = clientData.data.lastname || 'N/A';
 		clientInfo.sex = clientData.data.sex || 'N/A';
@@ -87,6 +90,7 @@ function Profile (props) {
 		clientInfo.secondEmail = clientData.data.secondaryemail || 'N/A';
 		clientInfo.phoneNumber = clientData.data.phonenumber || 'N/A';
 		clientInfo.phoneType = clientData.data.phoneType || 'N/A';
+		if (loading && clientData.id===props.id) setLoading(false);
 	}
 	
 	const [open, setOpen] = useState(false);
@@ -262,6 +266,7 @@ function Profile (props) {
 			/>
 			<Divider />
 			<div class="profile-body">
+				{!loading && <>
 				<div>
 					<p><strong>First Name: </strong>{(props.name).split(' ')[0]}</p>
 					<p><strong>Last Name: </strong>{clientInfo.lastName}</p>
@@ -274,6 +279,8 @@ function Profile (props) {
 					<p><strong>Phone number: </strong>{clientInfo.phoneNumber}</p>
 					<p><strong>Phone Type: </strong>{clientInfo.phoneType}</p>
 				</div>
+				</>}
+				{loading && <CircularProgress />}
 			</div>
 		</Card>
 	);		
