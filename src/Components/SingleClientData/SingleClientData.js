@@ -93,6 +93,8 @@ function BuildPlot(props)
 	let retPastData = []
 	let formattedTrackedItem;
 
+	const [hintData, setHintData] = useState(null);
+
 	if (!retrievedInfo) return <p>Awaiting Data</p>
 	let categories = Object.keys(retrievedInfo);
 	if (!categories.includes(trackedItem)) console.log('ERROR, cannot track %s', trackedItem);
@@ -132,20 +134,31 @@ function BuildPlot(props)
 				<XAxis tickLabelAngle={-30} tickFormat={v => createDateString(v)}/>
 				<YAxis/>
 				<LineSeries curve="curveLinear" data={retData} 
-				//</XYPlot>onNearestXY={
-				//	(datapoint, e) => 
-				// {
-				// 	console.log(datapoint);
-				// 	return <Hint value={datapoint}>
-				// 		<div style={{background:'black'}}>
-				// 			<p>{datapoint.x}</p>
-				// 			<p>{datapoint.y}</p>
+					onNearestXY={
+							(datapoint, e) => 
+						{
+							console.log(datapoint);
+							setHintData(datapoint);
+							// return <Hint value={datapoint}>
+							// 	{/* <div style={{background:'black'}}>
+							// 		<p>{datapoint.x}</p>
+							// 		<p>{datapoint.y}</p>
 
-				// 		</div>
-				// 	</Hint>
-				// }
-			//} 
-			style={{fill: 'none'}}></LineSeries>
+							// 	</div> */}
+							// </Hint>
+						}
+					} 
+					style={{fill: 'none'}}
+				>
+				</LineSeries>
+				{hintData && <Hint value={hintData}>
+					<div style={{
+						border:'1px solid black',
+						background: 'white'
+					}}>
+						<p>{hintData.x.toDateString()}: {hintData.y}</p>
+					</div>
+				</Hint>}
 			</XYPlot>
 		</div>
 	)
