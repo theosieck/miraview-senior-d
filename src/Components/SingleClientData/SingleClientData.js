@@ -4,8 +4,9 @@ import { Redirect } from "react-router-dom";
 import { auth } from '../../firebase/Firebase';
 import { Avatar, Grid } from "@material-ui/core";
 import { Button, Divider, Stack, ToggleButton, ToggleButtonGroup } from "@mui/material";
-import {XYPlot, AreaSeries, LineSeries, LineMarkSeries, XAxis, YAxis, VerticalGridLines, HorizontalGridLines, CircularGridLines} from 'react-vis';
+import {XYPlot, AreaSeries, LineSeries, LineMarkSeries, XAxis, YAxis, VerticalGridLines, HorizontalGridLines, Hint} from 'react-vis';
 import { getClientData } from '../../firebase/Firebase';
+import "./SingleClientData.css"
 const d3 = require('d3');
 
 const createDateString = (value) =>
@@ -44,10 +45,12 @@ const PCL5Chart = (retrievedInfo, width) => {
 	}) : pcl5Obj = {};
 
 	return (
+	<div>
+	<h3>PCL-5</h3>
 	<XYPlot xType="time" stackBy="y" width={width} height={200}>
 	<VerticalGridLines />
 	<HorizontalGridLines />
-	<XAxis tickLabelAngle={-45} tickFormat={v => createDateString(v)}/>
+	<XAxis tickLabelAngle={-30} tickFormat={v => createDateString(v)}/>
 	<YAxis/>
 	<AreaSeries
 	  className="area-series-example"
@@ -73,7 +76,8 @@ const PCL5Chart = (retrievedInfo, width) => {
 	  data={pcl5Obj.Hyperarousal}
 	  color="#FFF976FE"
 	/>
-  </XYPlot>);
+  </XYPlot>
+  </div>);
 }
 
 function BuildPlot(props)
@@ -87,6 +91,7 @@ function BuildPlot(props)
 
 	let retData = [];
 	let retPastData = []
+	let formattedTrackedItem;
 
 	if (!retrievedInfo) return <p>Awaiting Data</p>
 	let categories = Object.keys(retrievedInfo);
@@ -114,18 +119,35 @@ function BuildPlot(props)
 			// 	date.setDate(date.getDate() + 7);
 			// 	retPastData.push({x: date, y: Object.values(unsortedPast[index])[0]});
 			// })
-
+			formattedTrackedItem = trackedItem.split(/(?=[A-Z])/).join(' ');
 		}
 	}
 
 	return (
-		<XYPlot width={width} height={200} style={{maxWidth: 'inherit'}}>
-			<VerticalGridLines />
-			<HorizontalGridLines />
-			<XAxis tickLabelAngle={-45} tickFormat={v => createDateString(v)}/>
-			<YAxis/>
-			<LineSeries curve="curveLinear" data={retData} style={{fill: 'none'}}></LineSeries>
-		</XYPlot>
+		<div>
+			<h3>{formattedTrackedItem}</h3>
+			<XYPlot width={width} height={200} style={{maxWidth: 'inherit'}}>
+				<VerticalGridLines />
+				<HorizontalGridLines />
+				<XAxis tickLabelAngle={-30} tickFormat={v => createDateString(v)}/>
+				<YAxis/>
+				<LineSeries curve="curveLinear" data={retData} 
+				//</XYPlot>onNearestXY={
+				//	(datapoint, e) => 
+				// {
+				// 	console.log(datapoint);
+				// 	return <Hint value={datapoint}>
+				// 		<div style={{background:'black'}}>
+				// 			<p>{datapoint.x}</p>
+				// 			<p>{datapoint.y}</p>
+
+				// 		</div>
+				// 	</Hint>
+				// }
+			//} 
+			style={{fill: 'none'}}></LineSeries>
+			</XYPlot>
+		</div>
 	)
 }
 
