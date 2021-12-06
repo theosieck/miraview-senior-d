@@ -81,7 +81,10 @@ function Profile (props) {
 	let clientInfo = {};
 	if (clientData && clientData.data && clientStatisticsData)
 	{
-		clientInfo.email = clientStatisticsData.idObjects[props.id].email || 'N/A'; //?
+		clientInfo.email = 'N/A';
+		if (clientStatisticsData && clientStatisticsData.idObjects && clientStatisticsData.idObjects[props.id] && clientStatisticsData.idObjects[props.id].email) {
+			clientInfo.email = clientStatisticsData.idObjects[props.id].email;
+		}
 		clientInfo.lastName = clientData.data.lastname || 'N/A';
 		clientInfo.sex = clientData.data.sex || 'N/A';
 		clientInfo.gender = clientData.data.gender || 'N/A';
