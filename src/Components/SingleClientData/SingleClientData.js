@@ -31,6 +31,36 @@ const formatData = (dataToFormat) =>
 const PCL5Chart = (retrievedInfo, width, height) => {
 	let pcl5Obj = {};
 
+	const pcl5Colors = {
+		Intrusion:"#6ED2EC",
+		Avoidance:"#2D68DB",
+		NegativeFeelings:"#B777FF",
+		Hyperarousal:"#F976FE"
+	}
+
+	const legendItems = [
+		{
+			title:'Intrusion',
+			color: pcl5Colors.Intrusion,
+			strokeWidth: 20
+		},
+		{
+			title:'Avoidance',
+			color: pcl5Colors.Avoidance,
+			strokeWidth: 20
+		},
+		{
+			title:'Negative Feelings',
+			color: pcl5Colors.NegativeFeelings,
+			strokeWidth: 20
+		},
+		{
+			title:'Hyperarousal',
+			color: pcl5Colors.Hyperarousal,
+			strokeWidth: 20
+		}
+	]
+
 	retrievedInfo && retrievedInfo.PCL5 ? Object.keys(retrievedInfo.PCL5).forEach((key)=>
 	{
 		let sortedKeys = formatData(retrievedInfo.PCL5[key]);
@@ -56,26 +86,27 @@ const PCL5Chart = (retrievedInfo, width, height) => {
 	  className="area-series-example"
 	  curve="curveLinear"
 	  data={pcl5Obj.Intrusion}
-	  color="#6ED2EC"
+	  color={pcl5Colors.Intrusion}
 	/>
 	<AreaSeries
 	  className="area-series-example"
 	  curve="curveLinear"
 	  data={pcl5Obj.Avoidance}
-	  color="#2D68DB"
+	  color={pcl5Colors.Avoidance}
 	/>
 	<AreaSeries
 	  className="area-series-example"
 	  curve="curveLinear"
 	  data={pcl5Obj.NegativeFeelings}
-	  color="#B777FF"
+	  color={pcl5Colors.NegativeFeelings}
 	/>
 	<AreaSeries
 	  className="area-series-example"
 	  curve="curveLinear"
 	  data={pcl5Obj.Hyperarousal}
-	  color="#F976FE"
+	  color={pcl5Colors.Hyperarousal}
 	/>
+	<DiscreteColorLegend items={legendItems} orientation='horizontal' className="single-client-data-legend single-client-data-legend-pcl5"/>
   </XYPlot>
   </div>);
 }
@@ -94,6 +125,17 @@ function BuildPlot(props)
 	let retData = [];
 	let retPastData = []
 	let formattedTrackedItem;
+
+	const legendItems = [
+		{
+			title: legendTitle,
+			strokeStyle: 'solid'
+		},
+		{
+			title: 'previous period',
+			strokeStyle: 'dashed'
+		}
+	]
 
 	if (!retrievedInfo) return 'Awaiting data';
 	let categories = Object.keys(retrievedInfo);
@@ -149,7 +191,7 @@ function BuildPlot(props)
 			//} 
 				style={{fill: 'none'}}>
 				</LineSeries>
-				<DiscreteColorLegend items={[legendTitle]} />
+				<DiscreteColorLegend items={legendItems} orientation='horizontal' className="single-client-data-legend"/>
 			</XYPlot>
 		</div>
 	)
@@ -263,7 +305,7 @@ export default function SingleClientData() {
 				<br/>
 				<Divider variant="middle" sx={{ borderBottomWidth: 3 }}/>
 				<Grid container spacing={2} xs={12}>
-					<Grid item ref={sizingElement} container spacing={1} xs={12}>
+					<Grid item ref={sizingElement} container spacing={3} xs={12}>
 						<Grid item xs={5}>
 							{PCL5Chart(retrievedInfo, width, height)}
 						</Grid>
