@@ -2,3 +2,33 @@ text.rv-xy-plot__axis__tick__text
 {
     font-size: 10px;
 }
+
+.single-client-data-circular-progress {
+    display:flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 100%;
+    min-height: 100vh;
+}
+
+.single-client-data-legend {
+    display: flex;
+    justify-content: center;
+    margin: 10px;
+}
+
+.rv-discrete-color-legend-item.horizontal {
+    display: flex;
+    align-items: center;
+    margin: 5px;
+}
+
+.rv-discrete-color-legend-item__title {
+    margin-left: 2px;
+}
+
+.single-client-data-legend-pcl5 .rv-discrete-color-legend-item__color {
+    height: 12px !important;
+    width: 12px !important;
+    margin-right: 2px;
+}

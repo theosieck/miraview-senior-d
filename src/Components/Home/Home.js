@@ -56,6 +56,7 @@ function Home () {
 	return(
 		<div>
 			<ClientOverview activeToday={activeTodayClientsInfo} activeClients={activeClientsInfo}/>
+			<br/>
 			<ClientGrid clientList={clients} clientStats={clientsStatisticsData}></ClientGrid>
 		</div>
 	);	   
@@ -66,7 +67,7 @@ function ClientOverview(props)
 	let activeToday = props.activeToday;
 	let activeClients = props.activeClients
 	return (
-		<div style={{ width: '70%', borderBottom: '1px solid gray', marginBottom: "10px"}}>
+		<div style={{ width: '100%', borderBottom: '2px solid gray', marginBottom: "10px", boxShadow: "2px 3px lightgrey"}}>
 			<Box>
 				<Grid container spacing={0}>
 					<Grid item xs={6} sm={3}>
@@ -113,7 +114,7 @@ function ClientRow(props)
 		<Grid container>
 			<Grid item xs={3}>
 				<Grid container spacing={0}>
-					<Grid item xs={3}>
+					<Grid item style={{paddingLeft: "10px"}} xs={3}>
 						<Avatar/>
 					</Grid>
 					<Grid item xs={9}>

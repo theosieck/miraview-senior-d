@@ -3,8 +3,8 @@ import { useSelector } from "react-redux";
 import { Redirect } from "react-router-dom";
 import { auth } from '../../firebase/Firebase';
 import { Avatar, Grid } from "@material-ui/core";
-import { Button, Divider, Stack, ToggleButton, ToggleButtonGroup } from "@mui/material";
-import {XYPlot, AreaSeries, LineSeries, LineMarkSeries, XAxis, YAxis, VerticalGridLines, HorizontalGridLines, Hint} from 'react-vis';
+import { Button, CircularProgress, Divider, Stack, ToggleButton, ToggleButtonGroup } from "@mui/material";
+import {XYPlot, AreaSeries, LineSeries, LineMarkSeries, XAxis, YAxis, VerticalGridLines, HorizontalGridLines, Hint, DiscreteColorLegend} from 'react-vis';
 import { getClientData } from '../../firebase/Firebase';
 import "./SingleClientData.css"
 const d3 = require('d3');
@@ -28,8 +28,38 @@ const formatData = (dataToFormat) =>
 	return sortedKeys;
 }
 
-const PCL5Chart = (retrievedInfo, width) => {
+const PCL5Chart = (retrievedInfo, width, height) => {
 	let pcl5Obj = {};
+
+	const pcl5Colors = {
+		Intrusion:"#6ED2EC",
+		Avoidance:"#2D68DB",
+		NegativeFeelings:"#B777FF",
+		Hyperarousal:"#F976FE"
+	}
+
+	const legendItems = [
+		{
+			title:'Intrusion',
+			color: pcl5Colors.Intrusion,
+			strokeWidth: 20
+		},
+		{
+			title:'Avoidance',
+			color: pcl5Colors.Avoidance,
+			strokeWidth: 20
+		},
+		{
+			title:'Negative Feelings',
+			color: pcl5Colors.NegativeFeelings,
+			strokeWidth: 20
+		},
+		{
+			title:'Hyperarousal',
+			color: pcl5Colors.Hyperarousal,
+			strokeWidth: 20
+		}
+	]
 
 	retrievedInfo && retrievedInfo.PCL5 ? Object.keys(retrievedInfo.PCL5).forEach((key)=>
 	{
@@ -47,7 +77,7 @@ const PCL5Chart = (retrievedInfo, width) => {
 	return (
 	<div>
 	<h3>PCL-5</h3>
-	<XYPlot xType="time" stackBy="y" width={width} height={200}>
+	<XYPlot xType="time" stackBy="y" width={width} height={height}>
 	<VerticalGridLines />
 	<HorizontalGridLines />
 	<XAxis tickLabelAngle={-30} tickFormat={v => createDateString(v)}/>
@@ -56,26 +86,27 @@ const PCL5Chart = (retrievedInfo, width) => {
 	  className="area-series-example"
 	  curve="curveLinear"
 	  data={pcl5Obj.Intrusion}
-	  color="#FF6ED2EC"
+	  color={pcl5Colors.Intrusion}
 	/>
 	<AreaSeries
 	  className="area-series-example"
 	  curve="curveLinear"
 	  data={pcl5Obj.Avoidance}
-	  color="#FF2D68DB"
+	  color={pcl5Colors.Avoidance}
 	/>
 	<AreaSeries
 	  className="area-series-example"
 	  curve="curveLinear"
 	  data={pcl5Obj.NegativeFeelings}
-	  color="#FFB777FF"
+	  color={pcl5Colors.NegativeFeelings}
 	/>
 	<AreaSeries
 	  className="area-series-example"
 	  curve="curveLinear"
 	  data={pcl5Obj.Hyperarousal}
-	  color="#FFF976FE"
+	  color={pcl5Colors.Hyperarousal}
 	/>
+	<DiscreteColorLegend items={legendItems} orientation='horizontal' className="single-client-data-legend single-client-data-legend-pcl5"/>
   </XYPlot>
   </div>);
 }
@@ -86,7 +117,9 @@ function BuildPlot(props)
 		retrievedInfo,
 		trackedItem,
 		timePeriod,
-		width
+		width,
+		height,
+		legendTitle
 	} = props;
 
 	let retData = [];
@@ -95,7 +128,18 @@ function BuildPlot(props)
 
 	const [hintData, setHintData] = useState(null);
 
-	if (!retrievedInfo) return <p>Awaiting Data</p>
+	const legendItems = [
+		{
+			title: legendTitle,
+			strokeStyle: 'solid'
+		},
+		{
+			title: 'previous period',
+			strokeStyle: 'dashed'
+		}
+	]
+
+	if (!retrievedInfo) return 'Awaiting data';
 	let categories = Object.keys(retrievedInfo);
 	if (!categories.includes(trackedItem)) console.log('ERROR, cannot track %s', trackedItem);
 	else
@@ -128,7 +172,7 @@ function BuildPlot(props)
 	return (
 		<div>
 			<h3>{formattedTrackedItem}</h3>
-			<XYPlot width={width} height={200} style={{maxWidth: 'inherit'}}>
+			<XYPlot width={width} height={height} style={{maxWidth: 'inherit'}}>
 				<VerticalGridLines />
 				<HorizontalGridLines />
 				<XAxis tickLabelAngle={-30} tickFormat={v => createDateString(v)}/>
@@ -159,6 +203,7 @@ function BuildPlot(props)
 						<p>{hintData.x.toDateString()}: {hintData.y}</p>
 					</div>
 				</Hint>}
+				<DiscreteColorLegend items={legendItems} orientation='horizontal' className="single-client-data-legend"/>
 			</XYPlot>
 		</div>
 	)
@@ -169,6 +214,7 @@ export default function SingleClientData() {
 	const [selected, setSelected] = useState('Hypervigilance')
 	const [retrievedInfo, setRetrievedInfo] = useState(undefined);
 	const [width, setWidth] = useState(200);
+	const [height, setHeight] = useState(200);
 	const userData = useSelector((state) => state.user);
 	const clientToUse = useSelector((state) => state.clientToUse);
 	let sizingElement = React.createRef();
@@ -189,12 +235,13 @@ export default function SingleClientData() {
 		{
 			if (sizingElement && sizingElement.current)
 			{
-				setWidth(sizingElement.current.offsetWidth/2)
+				setWidth(sizingElement.current.offsetWidth * .4)
 			}
 			else
 			{
-				setWidth(window.innerWidth*.375)
+				setWidth(window.innerWidth*.35)
 			}
+			setHeight(width*.65);
 		}
 		window.addEventListener('resize', handleResize);
 		handleResize();
@@ -244,7 +291,8 @@ export default function SingleClientData() {
 
 	return (
 		<div>
-			<div style={ {padding: '20px'}}>
+			{!retrievedInfo && <div className="single-client-data-circular-progress"><CircularProgress /></div>}
+			{retrievedInfo && <div style={ {padding: '20px'}}>
 				<Grid container columnSpacing={2}>
 					<Grid item container xs={12} sm={6} md={5} lg={5} xl={5}>
 						<Grid item xs={3} sm={4} md={4} lg={3} xl={2}>
@@ -262,34 +310,35 @@ export default function SingleClientData() {
 						<ToggleButtonGroup color="primary" value={alignment} exclusive onChange={handleAlignment}>
 							<ToggleButton value="7days">7 Days</ToggleButton>
 							<ToggleButton value="1week">Last Week</ToggleButton>
-							<ToggleButton value="24days">24 Days</ToggleButton>
+							<ToggleButton value="28days">28 Days</ToggleButton>
 						</ToggleButtonGroup>
 					</Grid>
 				</Grid>
 				<br/>
 				<Divider variant="middle" sx={{ borderBottomWidth: 3 }}/>
 				<Grid container spacing={2} xs={12}>
-					<Grid item ref={sizingElement} container spacing={1} xs={10}>
-						<Grid item xs={6}>
-							{PCL5Chart(retrievedInfo, width)}
+					<Grid item ref={sizingElement} container spacing={3} xs={12}>
+						<Grid item xs={5}>
+							{PCL5Chart(retrievedInfo, width, height)}
 						</Grid>
-						<Grid item xs={6}>
-							<BuildPlot retrievedInfo={retrievedInfo} trackedItem={selected} timePeriod={alignment} width={width}></BuildPlot>
+						<Grid item xs={5}>
+							<BuildPlot retrievedInfo={retrievedInfo} trackedItem={selected} timePeriod={alignment} width={width} height={height} legendTitle={selected=='AvgSymptomsRating' ? 'avg rating' : 'symptom rating'}></BuildPlot>
 						</Grid>
-						<Grid item xs={6}>
-							<BuildPlot retrievedInfo={retrievedInfo} trackedItem='Triggers' timePeriod={alignment} width={width}></BuildPlot>
+						<Grid item xs={2}>
+							<ToggleButtonGroup orientation="vertical" exclusive value={selected} onChange={handleSelected}>
+								{retrievedInfo ? getTrackedSymptoms(retrievedInfo) : []}
+							</ToggleButtonGroup>
 						</Grid>
-						<Grid item xs={6}>
-							<BuildPlot retrievedInfo={retrievedInfo} trackedItem='GroundingExercises' timePeriod={alignment} width={width}></BuildPlot>
+						<Grid item xs={5}>
+							<BuildPlot retrievedInfo={retrievedInfo} trackedItem='Triggers' timePeriod={alignment} width={width} height={height} legendTitle="number of triggers"></BuildPlot>
+						</Grid>
+						<Grid item xs={5}>
+							<BuildPlot retrievedInfo={retrievedInfo} trackedItem='GroundingExercises' timePeriod={alignment} width={width} height={height} legendTitle="number of exercises"></BuildPlot>
 						</Grid>
 					</Grid>	
-					<Grid item xs={2}>
-						<ToggleButtonGroup orientation="vertical" exclusive value={selected} onChange={handleSelected}>
-							{retrievedInfo ? getTrackedSymptoms(retrievedInfo) : []}
-						</ToggleButtonGroup>
-					</Grid>
+					
 				</Grid>
-			</div>
+			</div>}
 		</div>
 	);
 }
