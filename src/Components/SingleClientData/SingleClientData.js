@@ -3,8 +3,8 @@ import { useSelector } from "react-redux";
 import { Redirect } from "react-router-dom";
 import { auth } from '../../firebase/Firebase';
 import { Avatar, Grid } from "@material-ui/core";
-import { Button, Divider, Stack, ToggleButton, ToggleButtonGroup } from "@mui/material";
-import {XYPlot, AreaSeries, LineSeries, LineMarkSeries, XAxis, YAxis, VerticalGridLines, HorizontalGridLines, Hint} from 'react-vis';
+import { Button, CircularProgress, Divider, Stack, ToggleButton, ToggleButtonGroup } from "@mui/material";
+import {XYPlot, AreaSeries, LineSeries, LineMarkSeries, XAxis, YAxis, VerticalGridLines, HorizontalGridLines, Hint, DiscreteColorLegend} from 'react-vis';
 import { getClientData } from '../../firebase/Firebase';
 import "./SingleClientData.css"
 const d3 = require('d3');
@@ -87,14 +87,15 @@ function BuildPlot(props)
 		trackedItem,
 		timePeriod,
 		width,
-		height
+		height,
+		legendTitle
 	} = props;
 
 	let retData = [];
 	let retPastData = []
 	let formattedTrackedItem;
 
-	if (!retrievedInfo) return <p>Awaiting Data</p>
+	if (!retrievedInfo) return 'Awaiting data';
 	let categories = Object.keys(retrievedInfo);
 	if (!categories.includes(trackedItem)) console.log('ERROR, cannot track %s', trackedItem);
 	else
@@ -146,7 +147,9 @@ function BuildPlot(props)
 				// 	</Hint>
 				// }
 			//} 
-			style={{fill: 'none'}}></LineSeries>
+				style={{fill: 'none'}}>
+				</LineSeries>
+				<DiscreteColorLegend items={[legendTitle]} />
 			</XYPlot>
 		</div>
 	)
@@ -234,7 +237,8 @@ export default function SingleClientData() {
 
 	return (
 		<div>
-			<div style={ {padding: '20px'}}>
+			{!retrievedInfo && <div className="single-client-data-circular-progress"><CircularProgress /></div>}
+			{retrievedInfo && <div style={ {padding: '20px'}}>
 				<Grid container columnSpacing={2}>
 					<Grid item container xs={12} sm={6} md={5} lg={5} xl={5}>
 						<Grid item xs={3} sm={4} md={4} lg={3} xl={2}>
@@ -264,7 +268,7 @@ export default function SingleClientData() {
 							{PCL5Chart(retrievedInfo, width, height)}
 						</Grid>
 						<Grid item xs={5}>
-							<BuildPlot retrievedInfo={retrievedInfo} trackedItem={selected} timePeriod={alignment} width={width} height={height}></BuildPlot>
+							<BuildPlot retrievedInfo={retrievedInfo} trackedItem={selected} timePeriod={alignment} width={width} height={height} legendTitle={selected=='AvgSymptomsRating' ? 'avg rating' : 'symptom rating'}></BuildPlot>
 						</Grid>
 						<Grid item xs={2}>
 							<ToggleButtonGroup orientation="vertical" exclusive value={selected} onChange={handleSelected}>
@@ -272,15 +276,15 @@ export default function SingleClientData() {
 							</ToggleButtonGroup>
 						</Grid>
 						<Grid item xs={5}>
-							<BuildPlot retrievedInfo={retrievedInfo} trackedItem='Triggers' timePeriod={alignment} width={width} height={height}></BuildPlot>
+							<BuildPlot retrievedInfo={retrievedInfo} trackedItem='Triggers' timePeriod={alignment} width={width} height={height} legendTitle="number of triggers"></BuildPlot>
 						</Grid>
 						<Grid item xs={5}>
-							<BuildPlot retrievedInfo={retrievedInfo} trackedItem='GroundingExercises' timePeriod={alignment} width={width} height={height}></BuildPlot>
+							<BuildPlot retrievedInfo={retrievedInfo} trackedItem='GroundingExercises' timePeriod={alignment} width={width} height={height} legendTitle="number of exercises"></BuildPlot>
 						</Grid>
 					</Grid>	
 					
 				</Grid>
-			</div>
+			</div>}
 		</div>
 	);
 }
