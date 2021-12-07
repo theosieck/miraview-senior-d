@@ -28,7 +28,7 @@ const formatData = (dataToFormat) =>
 	return sortedKeys;
 }
 
-const PCL5Chart = (retrievedInfo, width) => {
+const PCL5Chart = (retrievedInfo, width, height) => {
 	let pcl5Obj = {};
 
 	retrievedInfo && retrievedInfo.PCL5 ? Object.keys(retrievedInfo.PCL5).forEach((key)=>
@@ -47,7 +47,7 @@ const PCL5Chart = (retrievedInfo, width) => {
 	return (
 	<div>
 	<h3>PCL-5</h3>
-	<XYPlot xType="time" stackBy="y" width={width} height={200}>
+	<XYPlot xType="time" stackBy="y" width={width} height={height}>
 	<VerticalGridLines />
 	<HorizontalGridLines />
 	<XAxis tickLabelAngle={-30} tickFormat={v => createDateString(v)}/>
@@ -56,25 +56,25 @@ const PCL5Chart = (retrievedInfo, width) => {
 	  className="area-series-example"
 	  curve="curveLinear"
 	  data={pcl5Obj.Intrusion}
-	  color="#FF6ED2EC"
+	  color="#6ED2EC"
 	/>
 	<AreaSeries
 	  className="area-series-example"
 	  curve="curveLinear"
 	  data={pcl5Obj.Avoidance}
-	  color="#FF2D68DB"
+	  color="#2D68DB"
 	/>
 	<AreaSeries
 	  className="area-series-example"
 	  curve="curveLinear"
 	  data={pcl5Obj.NegativeFeelings}
-	  color="#FFB777FF"
+	  color="#B777FF"
 	/>
 	<AreaSeries
 	  className="area-series-example"
 	  curve="curveLinear"
 	  data={pcl5Obj.Hyperarousal}
-	  color="#FFF976FE"
+	  color="#F976FE"
 	/>
   </XYPlot>
   </div>);
@@ -86,7 +86,8 @@ function BuildPlot(props)
 		retrievedInfo,
 		trackedItem,
 		timePeriod,
-		width
+		width,
+		height
 	} = props;
 
 	let retData = [];
@@ -126,7 +127,7 @@ function BuildPlot(props)
 	return (
 		<div>
 			<h3>{formattedTrackedItem}</h3>
-			<XYPlot width={width} height={200} style={{maxWidth: 'inherit'}}>
+			<XYPlot width={width} height={height} style={{maxWidth: 'inherit'}}>
 				<VerticalGridLines />
 				<HorizontalGridLines />
 				<XAxis tickLabelAngle={-30} tickFormat={v => createDateString(v)}/>
@@ -156,6 +157,7 @@ export default function SingleClientData() {
 	const [selected, setSelected] = useState('Hypervigilance')
 	const [retrievedInfo, setRetrievedInfo] = useState(undefined);
 	const [width, setWidth] = useState(200);
+	const [height, setHeight] = useState(200);
 	const userData = useSelector((state) => state.user);
 	const clientToUse = useSelector((state) => state.clientToUse);
 	let sizingElement = React.createRef();
@@ -176,12 +178,13 @@ export default function SingleClientData() {
 		{
 			if (sizingElement && sizingElement.current)
 			{
-				setWidth(sizingElement.current.offsetWidth/2)
+				setWidth(sizingElement.current.offsetWidth * .4)
 			}
 			else
 			{
-				setWidth(window.innerWidth*.375)
+				setWidth(window.innerWidth*.35)
 			}
+			setHeight(width*.65);
 		}
 		window.addEventListener('resize', handleResize);
 		handleResize();
@@ -256,25 +259,26 @@ export default function SingleClientData() {
 				<br/>
 				<Divider variant="middle" sx={{ borderBottomWidth: 3 }}/>
 				<Grid container spacing={2} xs={12}>
-					<Grid item ref={sizingElement} container spacing={1} xs={10}>
-						<Grid item xs={6}>
-							{PCL5Chart(retrievedInfo, width)}
+					<Grid item ref={sizingElement} container spacing={1} xs={12}>
+						<Grid item xs={5}>
+							{PCL5Chart(retrievedInfo, width, height)}
 						</Grid>
-						<Grid item xs={6}>
-							<BuildPlot retrievedInfo={retrievedInfo} trackedItem={selected} timePeriod={alignment} width={width}></BuildPlot>
+						<Grid item xs={5}>
+							<BuildPlot retrievedInfo={retrievedInfo} trackedItem={selected} timePeriod={alignment} width={width} height={height}></BuildPlot>
 						</Grid>
-						<Grid item xs={6}>
-							<BuildPlot retrievedInfo={retrievedInfo} trackedItem='Triggers' timePeriod={alignment} width={width}></BuildPlot>
+						<Grid item xs={2}>
+							<ToggleButtonGroup orientation="vertical" exclusive value={selected} onChange={handleSelected}>
+								{retrievedInfo ? getTrackedSymptoms(retrievedInfo) : []}
+							</ToggleButtonGroup>
 						</Grid>
-						<Grid item xs={6}>
-							<BuildPlot retrievedInfo={retrievedInfo} trackedItem='GroundingExercises' timePeriod={alignment} width={width}></BuildPlot>
+						<Grid item xs={5}>
+							<BuildPlot retrievedInfo={retrievedInfo} trackedItem='Triggers' timePeriod={alignment} width={width} height={height}></BuildPlot>
+						</Grid>
+						<Grid item xs={5}>
+							<BuildPlot retrievedInfo={retrievedInfo} trackedItem='GroundingExercises' timePeriod={alignment} width={width} height={height}></BuildPlot>
 						</Grid>
 					</Grid>	
-					<Grid item xs={2}>
-						<ToggleButtonGroup orientation="vertical" exclusive value={selected} onChange={handleSelected}>
-							{retrievedInfo ? getTrackedSymptoms(retrievedInfo) : []}
-						</ToggleButtonGroup>
-					</Grid>
+					
 				</Grid>
 			</div>
 		</div>
