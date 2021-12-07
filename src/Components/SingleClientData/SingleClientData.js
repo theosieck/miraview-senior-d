@@ -298,7 +298,7 @@ export default function SingleClientData() {
 						<ToggleButtonGroup color="primary" value={alignment} exclusive onChange={handleAlignment}>
 							<ToggleButton value="7days">7 Days</ToggleButton>
 							<ToggleButton value="1week">Last Week</ToggleButton>
-							<ToggleButton value="24days">24 Days</ToggleButton>
+							<ToggleButton value="28days">28 Days</ToggleButton>
 						</ToggleButtonGroup>
 					</Grid>
 				</Grid>
