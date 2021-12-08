@@ -119,7 +119,8 @@ function BuildPlot(props)
 		timePeriod,
 		width,
 		height,
-		legendTitle
+		legendTitle,
+		plotType
 	} = props;
 
 	let retData = [];
@@ -169,6 +170,17 @@ function BuildPlot(props)
 		}
 	}
 
+	const setUpHint = (datapoint, e) => {
+		const hint = {
+			x: e.event.clientX,
+			y: e.event.clientY,
+			date: datapoint.x,
+			val: datapoint.y
+		}
+
+		setHintData(hint);
+	}
+
 	return (
 		<div>
 			<h3>{formattedTrackedItem}</h3>
@@ -177,32 +189,42 @@ function BuildPlot(props)
 				<HorizontalGridLines />
 				<XAxis tickLabelAngle={-30} tickFormat={v => createDateString(v)}/>
 				<YAxis/>
-				<LineSeries curve="curveLinear" data={retData} 
-					onNearestXY={
-							(datapoint, e) => 
-						{
-							console.log(datapoint);
-							setHintData(datapoint);
-							// return <Hint value={datapoint}>
-							// 	{/* <div style={{background:'black'}}>
-							// 		<p>{datapoint.x}</p>
-							// 		<p>{datapoint.y}</p>
-
-							// 	</div> */}
-							// </Hint>
-						}
-					} 
+				{plotType==='line' && <LineSeries
+					curve="curveLinear"
+					data={retData} 
+					onNearestXY={ setUpHint }
 					style={{fill: 'none'}}
 				>
-				</LineSeries>
-				{hintData && <Hint value={hintData}>
+				</LineSeries>}
+				{plotType==='mark' && <LineMarkSeries
+					curve="curveLinear"
+					data={retData}
+					onValueMouseOver={ setUpHint }
+					style={{fill: 'none'}}
+				>
+				</LineMarkSeries>}
+				{hintData && <div style={{
+					position: 'absolute',
+					left: `${hintData.x}px`,
+					top: `${hintData.y}px`,
+				}}>
 					<div style={{
 						border:'1px solid black',
 						background: 'white'
 					}}>
-						<p>{hintData.x.toDateString()}: {hintData.y}</p>
+						<p>{hintData.date.toDateString()}: {hintData.val}</p>
 					</div>
-				</Hint>}
+				</div>}
+				{/* {hintData && <Hint value={hintData} >
+					{console.log(hintData)}
+				 	<div style={{
+						border:'1px solid black',
+						background: 'white'
+					}}>
+						<p>{hintData.x}: {hintData.y}</p>
+						{/* <p>{hintData.x.toDateString()}: {hintData.y}</p>
+					</div>
+				</Hint>} */}
 				<DiscreteColorLegend items={legendItems} orientation='horizontal' className="single-client-data-legend"/>
 			</XYPlot>
 		</div>
@@ -322,7 +344,7 @@ export default function SingleClientData() {
 							{PCL5Chart(retrievedInfo, width, height)}
 						</Grid>
 						<Grid item xs={5}>
-							<BuildPlot retrievedInfo={retrievedInfo} trackedItem={selected} timePeriod={alignment} width={width} height={height} legendTitle={selected=='AvgSymptomsRating' ? 'avg rating' : 'symptom rating'}></BuildPlot>
+							<BuildPlot plotType='line' retrievedInfo={retrievedInfo} trackedItem={selected} timePeriod={alignment} width={width} height={height} legendTitle={selected=='AvgSymptomsRating' ? 'avg rating' : 'symptom rating'}></BuildPlot>
 						</Grid>
 						<Grid item xs={2}>
 							<ToggleButtonGroup orientation="vertical" exclusive value={selected} onChange={handleSelected}>
@@ -330,10 +352,10 @@ export default function SingleClientData() {
 							</ToggleButtonGroup>
 						</Grid>
 						<Grid item xs={5}>
-							<BuildPlot retrievedInfo={retrievedInfo} trackedItem='Triggers' timePeriod={alignment} width={width} height={height} legendTitle="number of triggers"></BuildPlot>
+							<BuildPlot plotType='mark' retrievedInfo={retrievedInfo} trackedItem='Triggers' timePeriod={alignment} width={width} height={height} legendTitle="number of triggers"></BuildPlot>
 						</Grid>
 						<Grid item xs={5}>
-							<BuildPlot retrievedInfo={retrievedInfo} trackedItem='GroundingExercises' timePeriod={alignment} width={width} height={height} legendTitle="number of exercises"></BuildPlot>
+							<BuildPlot plotType='mark' retrievedInfo={retrievedInfo} trackedItem='GroundingExercises' timePeriod={alignment} width={width} height={height} legendTitle="number of exercises"></BuildPlot>
 						</Grid>
 					</Grid>	
 					
