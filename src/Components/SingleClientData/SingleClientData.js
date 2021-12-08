@@ -2,7 +2,7 @@ import React, { useState, useLayoutEffect, useEffect, useRef } from 'react';
 import { useSelector } from "react-redux";
 import { Redirect } from "react-router-dom";
 import { auth } from '../../firebase/Firebase';
-import { Avatar, Grid } from "@material-ui/core";
+import { Avatar, Grid, Paper } from "@material-ui/core";
 import { Button, CircularProgress, Divider, Stack, ToggleButton, ToggleButtonGroup } from "@mui/material";
 import {XYPlot, AreaSeries, LineSeries, LineMarkSeries, XAxis, YAxis, VerticalGridLines, HorizontalGridLines, Hint, DiscreteColorLegend} from 'react-vis';
 import { getClientData } from '../../firebase/Firebase';
@@ -79,7 +79,7 @@ const PCL5Chart = (props) => {
 	}) : pcl5Obj = {};
 
 	const setUpHint = (datapoint, e, type) => {
-		console.log(datapoint, e);
+		// console.log(datapoint, e);
 		const hint = {
 			x: e.event.clientX,
 			y: e.event.clientY,
@@ -94,7 +94,9 @@ const PCL5Chart = (props) => {
 	return (
 	<div>
 	<h3>PCL-5</h3>
-	<XYPlot xType="time" stackBy="y" width={width} height={height}>
+	<XYPlot xType="time" stackBy="y" width={width} height={height}
+		onMouseLeave={(e) => {setHintData(null)}}
+	>
 	<VerticalGridLines />
 	<HorizontalGridLines />
 	<XAxis tickLabelAngle={-30} tickFormat={v => createDateString(v)}/>
@@ -143,19 +145,15 @@ const PCL5Chart = (props) => {
 			if (onLine.current[3]) setUpHint(datapoint, e, 'Hyperarousal')
 		}}
 	/>
-	{hintData && <div style={{
+	{hintData && <Paper className='single-client-data-hint' style={{
 		position: 'absolute',
 		left: `${hintData.x}px`,
-		top: `${hintData.y}px`,
+		top: `${hintData.y}px`
 	}}>
-		<div style={{
-			border:'1px solid black',
-			background: 'white'
-		}}>
 			<h4>{hintData.type}</h4>
-			<p>{hintData.date.toDateString()}: {hintData.val}</p>
-		</div>
-	</div>}
+			<p>{createDateString(hintData.date.getTime())}</p>
+			<p>{hintData.val}</p>
+	</Paper>}
 	<DiscreteColorLegend items={legendItems} orientation='horizontal' className="single-client-data-legend single-client-data-legend-pcl5"/>
   </XYPlot>
   </div>);
@@ -234,47 +232,35 @@ function BuildPlot(props)
 	return (
 		<div>
 			<h3>{formattedTrackedItem}</h3>
-			<XYPlot width={width} height={height} style={{maxWidth: 'inherit'}}>
+			<XYPlot width={width} height={height} style={{maxWidth: 'inherit'}}
+				onMouseLeave={(e) => {setHintData(null)}}
+			>
 				<VerticalGridLines />
 				<HorizontalGridLines />
 				<XAxis tickLabelAngle={-30} tickFormat={v => createDateString(v)}/>
 				<YAxis/>
-				{plotType==='line' && <LineSeries
+				<LineSeries
 					curve="curveLinear"
 					data={retData} 
 					onNearestXY={ setUpHint }
 					style={{fill: 'none'}}
 				>
-				</LineSeries>}
-				{plotType==='mark' && <LineMarkSeries
+				</LineSeries>
+				{/* {plotType==='mark' && <LineMarkSeries
 					curve="curveLinear"
 					data={retData}
 					onValueMouseOver={ setUpHint }
 					style={{fill: 'none'}}
 				>
-				</LineMarkSeries>}
-				{hintData && <div style={{
+				</LineMarkSeries>} */}
+				{hintData && <Paper className='single-client-data-hint' style={{
 					position: 'absolute',
 					left: `${hintData.x}px`,
 					top: `${hintData.y}px`,
 				}}>
-					<div style={{
-						border:'1px solid black',
-						background: 'white'
-					}}>
-						<p>{hintData.date.toDateString()}: {hintData.val}</p>
-					</div>
-				</div>}
-				{/* {hintData && <Hint value={hintData} >
-					{console.log(hintData)}
-				 	<div style={{
-						border:'1px solid black',
-						background: 'white'
-					}}>
-						<p>{hintData.x}: {hintData.y}</p>
-						{/* <p>{hintData.x.toDateString()}: {hintData.y}</p>
-					</div>
-				</Hint>} */}
+					<p>{createDateString(hintData.date.getTime())}</p>
+					<p>{hintData.val}</p>
+				</Paper>}
 				<DiscreteColorLegend items={legendItems} orientation='horizontal' className="single-client-data-legend"/>
 			</XYPlot>
 		</div>
@@ -389,7 +375,7 @@ export default function SingleClientData() {
 				<br/>
 				<Divider variant="middle" sx={{ borderBottomWidth: 3 }}/>
 				<Grid container spacing={2} xs={12}>
-					<Grid item ref={sizingElement} container spacing={3} xs={12}>
+					<Grid item ref={sizingElement} container spacing={6} xs={12}>
 						<Grid item xs={5}>
 							<PCL5Chart retrievedInfo={retrievedInfo} width={width} height={height}/>
 						</Grid>
