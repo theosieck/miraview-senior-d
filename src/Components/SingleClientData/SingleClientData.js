@@ -82,7 +82,7 @@ const PCL5Chart = (props) => {
 		// console.log(datapoint, e);
 		const hint = {
 			x: e.event.clientX,
-			y: e.event.clientY,
+			y: e.event.pageY,
 			date: datapoint.x,
 			val: datapoint.y,
 			type
@@ -152,7 +152,7 @@ const PCL5Chart = (props) => {
 	}}>
 			<h4>{hintData.type}</h4>
 			<p>{createDateString(hintData.date.getTime())}</p>
-			<p>{hintData.val}</p>
+			<p>Score: {hintData.val}</p>
 	</Paper>}
 	<DiscreteColorLegend items={legendItems} orientation='horizontal' className="single-client-data-legend single-client-data-legend-pcl5"/>
   </XYPlot>
@@ -168,7 +168,7 @@ function BuildPlot(props)
 		width,
 		height,
 		legendTitle,
-		plotType
+		descriptor
 	} = props;
 
 	let retData = [];
@@ -218,10 +218,11 @@ function BuildPlot(props)
 		}
 	}
 
-	const setUpHint = (datapoint, e) => {
+	const setUpHint = (datapoint, {event}) => {
+		console.log(event);
 		const hint = {
-			x: e.event.clientX,
-			y: e.event.clientY,
+			x: event.clientX,
+			y: event.pageY,
 			date: datapoint.x,
 			val: datapoint.y
 		}
@@ -239,27 +240,20 @@ function BuildPlot(props)
 				<HorizontalGridLines />
 				<XAxis tickLabelAngle={-30} tickFormat={v => createDateString(v)}/>
 				<YAxis/>
-				<LineSeries
-					curve="curveLinear"
-					data={retData} 
-					onNearestXY={ setUpHint }
-					style={{fill: 'none'}}
-				>
-				</LineSeries>
-				{/* {plotType==='mark' && <LineMarkSeries
+				<LineMarkSeries
 					curve="curveLinear"
 					data={retData}
 					onValueMouseOver={ setUpHint }
 					style={{fill: 'none'}}
 				>
-				</LineMarkSeries>} */}
+				</LineMarkSeries>
 				{hintData && <Paper className='single-client-data-hint' style={{
 					position: 'absolute',
 					left: `${hintData.x}px`,
 					top: `${hintData.y}px`,
 				}}>
 					<p>{createDateString(hintData.date.getTime())}</p>
-					<p>{hintData.val}</p>
+					<p>{descriptor}: {hintData.val}</p>
 				</Paper>}
 				<DiscreteColorLegend items={legendItems} orientation='horizontal' className="single-client-data-legend"/>
 			</XYPlot>
@@ -380,7 +374,7 @@ export default function SingleClientData() {
 							<PCL5Chart retrievedInfo={retrievedInfo} width={width} height={height}/>
 						</Grid>
 						<Grid item xs={5}>
-							<BuildPlot plotType='line' retrievedInfo={retrievedInfo} trackedItem={selected} timePeriod={alignment} width={width} height={height} legendTitle={selected=='AvgSymptomsRating' ? 'avg rating' : 'symptom rating'}></BuildPlot>
+							<BuildPlot plotType='line' retrievedInfo={retrievedInfo} trackedItem={selected} timePeriod={alignment} width={width} height={height} legendTitle={selected=='AvgSymptomsRating' ? 'avg rating' : 'symptom rating'} descriptor="Rating"></BuildPlot>
 						</Grid>
 						<Grid item xs={2}>
 							<ToggleButtonGroup orientation="vertical" exclusive value={selected} onChange={handleSelected}>
@@ -388,10 +382,10 @@ export default function SingleClientData() {
 							</ToggleButtonGroup>
 						</Grid>
 						<Grid item xs={5}>
-							<BuildPlot plotType='mark' retrievedInfo={retrievedInfo} trackedItem='Triggers' timePeriod={alignment} width={width} height={height} legendTitle="number of triggers"></BuildPlot>
+							<BuildPlot retrievedInfo={retrievedInfo} trackedItem='Triggers' timePeriod={alignment} width={width} height={height} legendTitle="number of triggers" descriptor="Count"></BuildPlot>
 						</Grid>
 						<Grid item xs={5}>
-							<BuildPlot plotType='mark' retrievedInfo={retrievedInfo} trackedItem='GroundingExercises' timePeriod={alignment} width={width} height={height} legendTitle="number of exercises"></BuildPlot>
+							<BuildPlot retrievedInfo={retrievedInfo} trackedItem='GroundingExercises' timePeriod={alignment} width={width} height={height} legendTitle="number of exercises" descriptor="Count"></BuildPlot>
 						</Grid>
 					</Grid>	
 					
