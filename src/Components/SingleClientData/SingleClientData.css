@@ -15,6 +15,7 @@ text.rv-xy-plot__axis__tick__text
     display: flex;
     justify-content: center;
     margin: 10px;
+    flex-wrap: wrap;
 }
 
 .rv-discrete-color-legend-item.horizontal {
@@ -31,4 +32,15 @@ text.rv-xy-plot__axis__tick__text
     height: 12px !important;
     width: 12px !important;
     margin-right: 2px;
+}
+
+.single-client-data-hint {
+    border:1px solid black;
+    padding: 5px;
+    text-align: center;
+    z-index: 10;
+}
+
+.single-client-data-hint h4, .single-client-data-hint p {
+    margin: 0;
 }

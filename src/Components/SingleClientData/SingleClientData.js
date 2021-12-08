@@ -1,8 +1,8 @@
-import React, { useState, useLayoutEffect, useEffect } from 'react';
+import React, { useState, useLayoutEffect, useEffect, useRef } from 'react';
 import { useSelector } from "react-redux";
 import { Redirect } from "react-router-dom";
 import { auth } from '../../firebase/Firebase';
-import { Avatar, Grid } from "@material-ui/core";
+import { Avatar, Grid, Paper } from "@material-ui/core";
 import { Button, CircularProgress, Divider, Stack, ToggleButton, ToggleButtonGroup } from "@mui/material";
 import {XYPlot, AreaSeries, LineSeries, LineMarkSeries, XAxis, YAxis, VerticalGridLines, HorizontalGridLines, Hint, DiscreteColorLegend} from 'react-vis';
 import { getClientData } from '../../firebase/Firebase';
@@ -28,7 +28,11 @@ const formatData = (dataToFormat) =>
 	return sortedKeys;
 }
 
-const PCL5Chart = (retrievedInfo, width, height) => {
+const PCL5Chart = (props) => {
+	const {retrievedInfo, width, height} = props;
+	const [hintData, setHintData] = useState(null);
+	const onLine = useRef({});
+
 	let pcl5Obj = {};
 
 	const pcl5Colors = {
@@ -74,10 +78,25 @@ const PCL5Chart = (retrievedInfo, width, height) => {
 		pcl5Obj[key] = data;
 	}) : pcl5Obj = {};
 
+	const setUpHint = (datapoint, e, type) => {
+		// console.log(datapoint, e);
+		const hint = {
+			x: e.event.clientX,
+			y: e.event.pageY,
+			date: datapoint.x,
+			val: datapoint.y,
+			type
+		}
+
+		setHintData(hint);
+	}
+
 	return (
 	<div>
 	<h3>PCL-5</h3>
-	<XYPlot xType="time" stackBy="y" width={width} height={height}>
+	<XYPlot xType="time" stackBy="y" width={width} height={height}
+		onMouseLeave={(e) => {setHintData(null)}}
+	>
 	<VerticalGridLines />
 	<HorizontalGridLines />
 	<XAxis tickLabelAngle={-30} tickFormat={v => createDateString(v)}/>
@@ -87,25 +106,54 @@ const PCL5Chart = (retrievedInfo, width, height) => {
 	  curve="curveLinear"
 	  data={pcl5Obj.Intrusion}
 	  color={pcl5Colors.Intrusion}
+	  onSeriesMouseOver={() => {onLine.current[0] = true}}
+	  onSeriesMouseOut={() => {onLine.current[0] = false}}
+	  onNearestXY={(datapoint, e) => {
+			if (onLine.current[0]) setUpHint(datapoint, e, 'Intrusion')
+		}}
 	/>
 	<AreaSeries
 	  className="area-series-example"
 	  curve="curveLinear"
 	  data={pcl5Obj.Avoidance}
 	  color={pcl5Colors.Avoidance}
+	  onSeriesMouseOver={() => {onLine.current[1] = true}}
+	  onSeriesMouseOut={() => {onLine.current[1] = false}}
+	  onNearestXY={(datapoint, e) => {
+			if (onLine.current[1]) setUpHint(datapoint, e, 'Avoidance')
+		}}
 	/>
 	<AreaSeries
 	  className="area-series-example"
 	  curve="curveLinear"
 	  data={pcl5Obj.NegativeFeelings}
 	  color={pcl5Colors.NegativeFeelings}
+	  onSeriesMouseOver={() => {onLine.current[2] = true}}
+	  onSeriesMouseOut={() => {onLine.current[2] = false}}
+	  onNearestXY={(datapoint, e) => {
+			if (onLine.current[2]) setUpHint(datapoint, e, 'Negative Feelings')
+		}}
 	/>
 	<AreaSeries
 	  className="area-series-example"
 	  curve="curveLinear"
 	  data={pcl5Obj.Hyperarousal}
 	  color={pcl5Colors.Hyperarousal}
+	  onSeriesMouseOver={() => {onLine.current[3] = true}}
+	  onSeriesMouseOut={() => {onLine.current[3] = false}}
+	  onNearestXY={(datapoint, e) => {
+			if (onLine.current[3]) setUpHint(datapoint, e, 'Hyperarousal')
+		}}
 	/>
+	{hintData && <Paper className='single-client-data-hint' style={{
+		position: 'absolute',
+		left: `${hintData.x}px`,
+		top: `${hintData.y}px`
+	}}>
+			<h4>{hintData.type}</h4>
+			<p>{createDateString(hintData.date.getTime())}</p>
+			<p>Score: {hintData.val}</p>
+	</Paper>}
 	<DiscreteColorLegend items={legendItems} orientation='horizontal' className="single-client-data-legend single-client-data-legend-pcl5"/>
   </XYPlot>
   </div>);
@@ -119,12 +167,15 @@ function BuildPlot(props)
 		timePeriod,
 		width,
 		height,
-		legendTitle
+		legendTitle,
+		descriptor
 	} = props;
 
 	let retData = [];
 	let retPastData = []
 	let formattedTrackedItem;
+
+	const [hintData, setHintData] = useState(null);
 
 	const legendItems = [
 		{
@@ -167,30 +218,43 @@ function BuildPlot(props)
 		}
 	}
 
+	const setUpHint = (datapoint, {event}) => {
+		console.log(event);
+		const hint = {
+			x: event.clientX,
+			y: event.pageY,
+			date: datapoint.x,
+			val: datapoint.y
+		}
+
+		setHintData(hint);
+	}
+
 	return (
 		<div>
 			<h3>{formattedTrackedItem}</h3>
-			<XYPlot width={width} height={height} style={{maxWidth: 'inherit'}}>
+			<XYPlot width={width} height={height} style={{maxWidth: 'inherit'}}
+				onMouseLeave={(e) => {setHintData(null)}}
+			>
 				<VerticalGridLines />
 				<HorizontalGridLines />
 				<XAxis tickLabelAngle={-30} tickFormat={v => createDateString(v)}/>
 				<YAxis/>
-				<LineSeries curve="curveLinear" data={retData} 
-				//</XYPlot>onNearestXY={
-				//	(datapoint, e) => 
-				// {
-				// 	console.log(datapoint);
-				// 	return <Hint value={datapoint}>
-				// 		<div style={{background:'black'}}>
-				// 			<p>{datapoint.x}</p>
-				// 			<p>{datapoint.y}</p>
-
-				// 		</div>
-				// 	</Hint>
-				// }
-			//} 
-				style={{fill: 'none'}}>
-				</LineSeries>
+				<LineMarkSeries
+					curve="curveLinear"
+					data={retData}
+					onValueMouseOver={ setUpHint }
+					style={{fill: 'none'}}
+				>
+				</LineMarkSeries>
+				{hintData && <Paper className='single-client-data-hint' style={{
+					position: 'absolute',
+					left: `${hintData.x}px`,
+					top: `${hintData.y}px`,
+				}}>
+					<p>{createDateString(hintData.date.getTime())}</p>
+					<p>{descriptor}: {hintData.val}</p>
+				</Paper>}
 				<DiscreteColorLegend items={legendItems} orientation='horizontal' className="single-client-data-legend"/>
 			</XYPlot>
 		</div>
@@ -305,12 +369,12 @@ export default function SingleClientData() {
 				<br/>
 				<Divider variant="middle" sx={{ borderBottomWidth: 3 }}/>
 				<Grid container spacing={2} xs={12}>
-					<Grid item ref={sizingElement} container spacing={3} xs={12}>
+					<Grid item ref={sizingElement} container spacing={6} xs={12}>
 						<Grid item xs={5}>
-							{PCL5Chart(retrievedInfo, width, height)}
+							<PCL5Chart retrievedInfo={retrievedInfo} width={width} height={height}/>
 						</Grid>
 						<Grid item xs={5}>
-							<BuildPlot retrievedInfo={retrievedInfo} trackedItem={selected} timePeriod={alignment} width={width} height={height} legendTitle={selected=='AvgSymptomsRating' ? 'avg rating' : 'symptom rating'}></BuildPlot>
+							<BuildPlot plotType='line' retrievedInfo={retrievedInfo} trackedItem={selected} timePeriod={alignment} width={width} height={height} legendTitle={selected=='AvgSymptomsRating' ? 'avg rating' : 'symptom rating'} descriptor="Rating"></BuildPlot>
 						</Grid>
 						<Grid item xs={2}>
 							<ToggleButtonGroup orientation="vertical" exclusive value={selected} onChange={handleSelected}>
@@ -318,10 +382,10 @@ export default function SingleClientData() {
 							</ToggleButtonGroup>
 						</Grid>
 						<Grid item xs={5}>
-							<BuildPlot retrievedInfo={retrievedInfo} trackedItem='Triggers' timePeriod={alignment} width={width} height={height} legendTitle="number of triggers"></BuildPlot>
+							<BuildPlot retrievedInfo={retrievedInfo} trackedItem='Triggers' timePeriod={alignment} width={width} height={height} legendTitle="number of triggers" descriptor="Count"></BuildPlot>
 						</Grid>
 						<Grid item xs={5}>
-							<BuildPlot retrievedInfo={retrievedInfo} trackedItem='GroundingExercises' timePeriod={alignment} width={width} height={height} legendTitle="number of exercises"></BuildPlot>
+							<BuildPlot retrievedInfo={retrievedInfo} trackedItem='GroundingExercises' timePeriod={alignment} width={width} height={height} legendTitle="number of exercises" descriptor="Count"></BuildPlot>
 						</Grid>
 					</Grid>	
 					
