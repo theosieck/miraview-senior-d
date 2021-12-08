@@ -1,4 +1,4 @@
-import React, { useState, useLayoutEffect, useEffect } from 'react';
+import React, { useState, useLayoutEffect, useEffect, useRef } from 'react';
 import { useSelector } from "react-redux";
 import { Redirect } from "react-router-dom";
 import { auth } from '../../firebase/Firebase';
@@ -28,7 +28,11 @@ const formatData = (dataToFormat) =>
 	return sortedKeys;
 }
 
-const PCL5Chart = (retrievedInfo, width, height) => {
+const PCL5Chart = (props) => {
+	const {retrievedInfo, width, height} = props;
+	const [hintData, setHintData] = useState(null);
+	const onLine = useRef({});
+
 	let pcl5Obj = {};
 
 	const pcl5Colors = {
@@ -74,6 +78,19 @@ const PCL5Chart = (retrievedInfo, width, height) => {
 		pcl5Obj[key] = data;
 	}) : pcl5Obj = {};
 
+	const setUpHint = (datapoint, e, type) => {
+		console.log(datapoint, e);
+		const hint = {
+			x: e.event.clientX,
+			y: e.event.clientY,
+			date: datapoint.x,
+			val: datapoint.y,
+			type
+		}
+
+		setHintData(hint);
+	}
+
 	return (
 	<div>
 	<h3>PCL-5</h3>
@@ -87,25 +104,58 @@ const PCL5Chart = (retrievedInfo, width, height) => {
 	  curve="curveLinear"
 	  data={pcl5Obj.Intrusion}
 	  color={pcl5Colors.Intrusion}
+	  onSeriesMouseOver={() => {onLine.current[0] = true}}
+	  onSeriesMouseOut={() => {onLine.current[0] = false}}
+	  onNearestXY={(datapoint, e) => {
+			if (onLine.current[0]) setUpHint(datapoint, e, 'Intrusion')
+		}}
 	/>
 	<AreaSeries
 	  className="area-series-example"
 	  curve="curveLinear"
 	  data={pcl5Obj.Avoidance}
 	  color={pcl5Colors.Avoidance}
+	  onSeriesMouseOver={() => {onLine.current[1] = true}}
+	  onSeriesMouseOut={() => {onLine.current[1] = false}}
+	  onNearestXY={(datapoint, e) => {
+			if (onLine.current[1]) setUpHint(datapoint, e, 'Avoidance')
+		}}
 	/>
 	<AreaSeries
 	  className="area-series-example"
 	  curve="curveLinear"
 	  data={pcl5Obj.NegativeFeelings}
 	  color={pcl5Colors.NegativeFeelings}
+	  onSeriesMouseOver={() => {onLine.current[2] = true}}
+	  onSeriesMouseOut={() => {onLine.current[2] = false}}
+	  onNearestXY={(datapoint, e) => {
+			if (onLine.current[2]) setUpHint(datapoint, e, 'Negative Feelings')
+		}}
 	/>
 	<AreaSeries
 	  className="area-series-example"
 	  curve="curveLinear"
 	  data={pcl5Obj.Hyperarousal}
 	  color={pcl5Colors.Hyperarousal}
+	  onSeriesMouseOver={() => {onLine.current[3] = true}}
+	  onSeriesMouseOut={() => {onLine.current[3] = false}}
+	  onNearestXY={(datapoint, e) => {
+			if (onLine.current[3]) setUpHint(datapoint, e, 'Hyperarousal')
+		}}
 	/>
+	{hintData && <div style={{
+		position: 'absolute',
+		left: `${hintData.x}px`,
+		top: `${hintData.y}px`,
+	}}>
+		<div style={{
+			border:'1px solid black',
+			background: 'white'
+		}}>
+			<h4>{hintData.type}</h4>
+			<p>{hintData.date.toDateString()}: {hintData.val}</p>
+		</div>
+	</div>}
 	<DiscreteColorLegend items={legendItems} orientation='horizontal' className="single-client-data-legend single-client-data-legend-pcl5"/>
   </XYPlot>
   </div>);
@@ -341,7 +391,7 @@ export default function SingleClientData() {
 				<Grid container spacing={2} xs={12}>
 					<Grid item ref={sizingElement} container spacing={3} xs={12}>
 						<Grid item xs={5}>
-							{PCL5Chart(retrievedInfo, width, height)}
+							<PCL5Chart retrievedInfo={retrievedInfo} width={width} height={height}/>
 						</Grid>
 						<Grid item xs={5}>
 							<BuildPlot plotType='line' retrievedInfo={retrievedInfo} trackedItem={selected} timePeriod={alignment} width={width} height={height} legendTitle={selected=='AvgSymptomsRating' ? 'avg rating' : 'symptom rating'}></BuildPlot>
