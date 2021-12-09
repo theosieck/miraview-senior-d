@@ -248,7 +248,7 @@ function BuildPlot(props)
 		} else {
 			setDataExists(true);
 		}
-	}, []);
+	}, [retData]);
 
 	const setUpHint = (datapoint, {event}) => {
 		console.log(event);
