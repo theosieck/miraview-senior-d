@@ -3,7 +3,7 @@ import { useSelector } from "react-redux";
 import { Redirect } from "react-router-dom";
 import { auth } from '../../firebase/Firebase';
 import { Avatar, Grid, Paper } from "@material-ui/core";
-import { Button, CircularProgress, Divider, Stack, ToggleButton, ToggleButtonGroup } from "@mui/material";
+import { Alert, Button, CircularProgress, Divider, Stack, ToggleButton, ToggleButtonGroup } from "@mui/material";
 import {XYPlot, AreaSeries, LineSeries, LineMarkSeries, XAxis, YAxis, VerticalGridLines, HorizontalGridLines, Hint, DiscreteColorLegend} from 'react-vis';
 import { getClientData } from '../../firebase/Firebase';
 import "./SingleClientData.css"
@@ -31,6 +31,7 @@ const formatData = (dataToFormat) =>
 const PCL5Chart = (props) => {
 	const {retrievedInfo, width, height} = props;
 	const [hintData, setHintData] = useState(null);
+	const [dataExists, setDataExists] = useState(null);
 	const onLine = useRef({});
 
 	let pcl5Obj = {};
@@ -78,6 +79,23 @@ const PCL5Chart = (props) => {
 		pcl5Obj[key] = data;
 	}) : pcl5Obj = {};
 
+	// check whether data exists or not
+	let count = 0, total = 0;
+	Object.keys(pcl5Obj).forEach((key) => {
+		total++
+		// if no data in key 
+		if (pcl5Obj[key].length == 0) {
+			count++
+		}
+	});
+	useEffect(() => {
+		if (count == total) {
+			setDataExists(false);
+		} else {
+			setDataExists(true);
+		}
+	}, []);
+
 	const setUpHint = (datapoint, e, type) => {
 		// console.log(datapoint, e);
 		const hint = {
@@ -94,6 +112,10 @@ const PCL5Chart = (props) => {
 	return (
 	<div>
 	<h3>PCL-5</h3>
+	
+	{!dataExists && dataExists == false && 
+	<Alert variant="filled" severity="info"> No data exists </Alert>}
+
 	<XYPlot xType="time" stackBy="y" width={width} height={height}
 		onMouseLeave={(e) => {setHintData(null)}}
 	>
@@ -176,6 +198,7 @@ function BuildPlot(props)
 	let formattedTrackedItem;
 
 	const [hintData, setHintData] = useState(null);
+	const [dataExists, setDataExists] = useState(null);
 
 	const legendItems = [
 		{
@@ -188,7 +211,7 @@ function BuildPlot(props)
 		}
 	]
 
-	if (!retrievedInfo) return 'Awaiting data';
+	//if (!retrievedInfo) return 'Awaiting data';
 	let categories = Object.keys(retrievedInfo);
 	if (!categories.includes(trackedItem)) console.log('ERROR, cannot track %s', trackedItem);
 	else
@@ -218,6 +241,15 @@ function BuildPlot(props)
 		}
 	}
 
+	// check whether data exists or not
+	useEffect(() => {
+		if (retData.length == 0) {
+			setDataExists(false);
+		} else {
+			setDataExists(true);
+		}
+	}, []);
+
 	const setUpHint = (datapoint, {event}) => {
 		console.log(event);
 		const hint = {
@@ -233,6 +265,10 @@ function BuildPlot(props)
 	return (
 		<div>
 			<h3>{formattedTrackedItem}</h3>
+
+			{!dataExists && dataExists == false && 
+			<Alert variant="filled" severity="info"> No data exists </Alert>}
+
 			<XYPlot width={width} height={height} style={{maxWidth: 'inherit'}}
 				onMouseLeave={(e) => {setHintData(null)}}
 			>
