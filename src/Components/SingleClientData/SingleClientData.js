@@ -121,13 +121,11 @@ const PCL5Chart = (props) => {
 	
 	{!dataExists && dataExists == false && 
 	<Alert variant="filled" severity="info"> No data exists </Alert>}
-
-		{dataExists && console.log(pcl5Obj)}
 	{dataExists && <XYPlot xType="time" stackBy="y" width={width} height={height}
 		onMouseLeave={(e) => {setHintData(null)}}
 	>
 	<HorizontalGridLines />
-	<XAxis tickLabelAngle={-30} tickValues={pcl5Obj.xAxisVals} tickFormat={(v) => createDateString(v)}/>
+	<XAxis tickValues={pcl5Obj.xAxisVals} tickFormat={(v) => createDateString(v)}/>
 	<YAxis/>
 	<AreaSeries
 	  className="area-series-example"
@@ -200,7 +198,6 @@ function BuildPlot(props)
 	} = props;
 
 	let retData = [];
-	let xAxisVals = [];
 	let retPastData = []
 	let data=[];
 	let formattedTrackedItem;
@@ -218,6 +215,38 @@ function BuildPlot(props)
 			strokeStyle: 'dashed'
 		}
 	]
+
+	// create the x-axis labels
+	const xAxisVals = [];
+	const hiddenLineData = [];
+	const today = new Date();
+	let period = 2;	// the number of days to step the axis by
+	let firstDay;
+	let lastDay = today;
+	if (timePeriod==='7days') firstDay = new Date(today.getTime() - 6.048e+8);
+	else if (timePeriod==='28days') {
+		firstDay = new Date(today.getTime() - 2.419e+9);
+		period = 4;
+	}
+	else if (timePeriod==='1week') {
+		const todayTmp = new Date();
+		const firstDayOfWeek = new Date(todayTmp.setDate(todayTmp.getDate() - todayTmp.getDay()));
+		firstDay = new Date(firstDayOfWeek.getTime() - 6.048e+8);
+		lastDay = firstDayOfWeek;
+	}
+	console.log(firstDay, today);
+	// add a value every 4 days
+	let currentDay = firstDay;
+	while (currentDay.getTime() <= lastDay.getTime()) {
+		console.log('in looop', currentDay);
+		xAxisVals.push(currentDay);
+		hiddenLineData.push({
+			x: currentDay,
+			y:1
+		});
+		currentDay = new Date(currentDay.getTime() + (86400000*period));
+	}
+	console.log(trackedItem, xAxisVals);
 
 	//if (!retrievedInfo) return 'Awaiting data';
 	let categories = Object.keys(retrievedInfo);
@@ -238,7 +267,6 @@ function BuildPlot(props)
 				let index = unsorted.findIndex((obj) => new Date(Object.keys(obj)[0]).getTime() === new Date(sortkey).getTime());
 				const x = new Date(sortkey);
 				retData.push({x: x, y: Object.values(unsorted[index])[0]});
-				if (!xAxisVals.includes(x)) xAxisVals.push(x);
 			});
 			// sortedPastKeys.forEach((sortkey) =>
 			// {
@@ -287,13 +315,20 @@ function BuildPlot(props)
 				onMouseLeave={(e) => {setHintData(null)}}
 			>
 				<HorizontalGridLines />
-				<XAxis tickLabelAngle={-30} tickValues={xAxisVals} tickFormat={v => createDateString(v)} totalTicks={retData.length}/>
+				{console.log(retData.length)}
+				<XAxis tickFormat={v => createDateString(v)} tickValues={xAxisVals}/>
 				<YAxis tickFormat={val => Math.round(val) === val ? val : ""}/>
 				<LineMarkSeries
 					curve="curveLinear"
 					data={retData}
 					onValueMouseOver={ setUpHint }
 					style={{fill: 'none'}}
+				>
+				</LineMarkSeries>
+				<LineMarkSeries
+					curve="curveLinear"
+					data={hiddenLineData}
+					style={{display: 'none'}}
 				>
 				</LineMarkSeries>
 				{hintData && <Paper className='single-client-data-hint' style={{
