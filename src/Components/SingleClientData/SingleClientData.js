@@ -104,15 +104,15 @@ const PCL5Chart = (props) => {
 
 	const setUpHint = (datapoint, e, type) => {
 		// console.log(datapoint, e);
-		const hint = {
-			x: e.event.clientX,
-			y: e.event.pageY,
-			date: datapoint.x,
-			val: datapoint.y,
-			type
-		}
-
-		setHintData(hint);
+		// const hint = {
+		// 	x: e.event.clientX,
+		// 	y: e.event.pageY,
+		// 	date: datapoint.x,
+		// 	val: datapoint.y,
+		// 	type
+		// }
+		datapoint.type = type;
+		setHintData(datapoint);
 	}
 
 	return (
@@ -171,15 +171,13 @@ const PCL5Chart = (props) => {
 			if (onLine.current[3]) setUpHint(datapoint, e, 'Hyperarousal')
 		}}
 	/>
-	{hintData && <Paper className='single-client-data-hint' style={{
-		position: 'absolute',
-		left: `${hintData.x}px`,
-		top: `${hintData.y}px`
-	}}>
-			<h4>{hintData.type}</h4>
-			<p>{createDateString(hintData.date.getTime())}</p>
-			<p>Score: {hintData.val}</p>
-	</Paper>}
+	{hintData && <Hint value={hintData}>
+		<Paper className='single-client-data-hint'>
+				<h4>{hintData.type}</h4>
+				<p>{createDateString(hintData.x.getTime())}</p>
+				<p>Score: {hintData.y}</p>
+		</Paper>
+	</Hint>}
 	<DiscreteColorLegend items={legendItems} orientation='horizontal' className="single-client-data-legend single-client-data-legend-pcl5"/>
   </XYPlot>}
   </div>);
@@ -234,11 +232,9 @@ function BuildPlot(props)
 		firstDay = new Date(firstDayOfWeek.getTime() - 6.048e+8);
 		lastDay = firstDayOfWeek;
 	}
-	console.log(firstDay, today);
 	// add a value every 4 days
 	let currentDay = firstDay;
 	while (currentDay.getTime() <= lastDay.getTime()) {
-		console.log('in looop', currentDay);
 		xAxisVals.push(currentDay);
 		hiddenLineData.push({
 			x: currentDay,
@@ -246,7 +242,6 @@ function BuildPlot(props)
 		});
 		currentDay = new Date(currentDay.getTime() + (86400000*period));
 	}
-	console.log(trackedItem, xAxisVals);
 
 	//if (!retrievedInfo) return 'Awaiting data';
 	let categories = Object.keys(retrievedInfo);
@@ -289,15 +284,15 @@ function BuildPlot(props)
 	}, [retData]);
 
 	const setUpHint = (datapoint, {event}) => {
-		console.log(event);
-		const hint = {
-			x: event.clientX,
-			y: event.pageY,
-			date: datapoint.x,
-			val: datapoint.y
-		}
+		// console.log(event);
+		// const hint = {
+		// 	x: event.screenX,
+		// 	y: event.screenY,
+		// 	date: datapoint.x,
+		// 	val: datapoint.y
+		// }
 
-		setHintData(hint);
+		setHintData(datapoint);
 	}
 
 	retData.map(coordinate=>(data.push(coordinate.y)));
@@ -315,7 +310,6 @@ function BuildPlot(props)
 				onMouseLeave={(e) => {setHintData(null)}}
 			>
 				<HorizontalGridLines />
-				{console.log(retData.length)}
 				<XAxis tickFormat={v => createDateString(v)} tickValues={xAxisVals}/>
 				<YAxis tickFormat={val => Math.round(val) === val ? val : ""}/>
 				<LineMarkSeries
@@ -331,14 +325,20 @@ function BuildPlot(props)
 					style={{display: 'none'}}
 				>
 				</LineMarkSeries>
-				{hintData && <Paper className='single-client-data-hint' style={{
+				{hintData && <Hint value={hintData}>
+					<Paper className='single-client-data-hint'>
+						<p>{createDateString(hintData.x.getTime())}</p>
+						<p>{descriptor}: {hintData.y}</p>
+					</Paper>
+				</Hint>}
+				{/* {hintData && <Paper className='single-client-data-hint' style={{
 					position: 'absolute',
 					left: `${hintData.x}px`,
 					top: `${hintData.y}px`,
 				}}>
 					<p>{createDateString(hintData.date.getTime())}</p>
 					<p>{descriptor}: {hintData.val}</p>
-				</Paper>}
+				</Paper>} */}
 				<DiscreteColorLegend items={legendItems} orientation='horizontal' className="single-client-data-legend"/>
 			</XYPlot>
 		</div>
