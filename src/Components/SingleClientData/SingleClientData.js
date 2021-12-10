@@ -72,13 +72,17 @@ const PCL5Chart = (props) => {
 	{
 		let sortedKeys = formatData(retrievedInfo.PCL5[key]);
 		let data = [];
+		const dates = [];
 		sortedKeys.forEach((sortkey) =>
 		{
 			let index = retrievedInfo.PCL5[key].findIndex((obj) => new Date(Object.keys(obj)[0]).getTime() === new Date(sortkey).getTime());
 
-			data.push({x: new Date(sortkey), y: Object.values(retrievedInfo.PCL5[key][index])[0]});
+			const x = new Date(sortkey);
+			data.push({x, y: Object.values(retrievedInfo.PCL5[key][index])[0]});
+			if (!dates.includes(x)) dates.push(x);
 		});
 		pcl5Obj[key] = data;
+		pcl5Obj.xAxisVals = dates;
 	}) : pcl5Obj = {};
 
 	// check whether data exists or not
@@ -118,11 +122,12 @@ const PCL5Chart = (props) => {
 	{!dataExists && dataExists == false && 
 	<Alert variant="filled" severity="info"> No data exists </Alert>}
 
-	<XYPlot xType="time" stackBy="y" width={width} height={height}
+		{dataExists && console.log(pcl5Obj)}
+	{dataExists && <XYPlot xType="time" stackBy="y" width={width} height={height}
 		onMouseLeave={(e) => {setHintData(null)}}
 	>
 	<HorizontalGridLines />
-	<XAxis tickLabelAngle={-30} tickFormat={v => createDateString(v)}/>
+	<XAxis tickLabelAngle={-30} tickValues={pcl5Obj.xAxisVals} tickFormat={(v) => createDateString(v)}/>
 	<YAxis/>
 	<AreaSeries
 	  className="area-series-example"
@@ -178,7 +183,7 @@ const PCL5Chart = (props) => {
 			<p>Score: {hintData.val}</p>
 	</Paper>}
 	<DiscreteColorLegend items={legendItems} orientation='horizontal' className="single-client-data-legend single-client-data-legend-pcl5"/>
-  </XYPlot>
+  </XYPlot>}
   </div>);
 }
 
@@ -195,6 +200,7 @@ function BuildPlot(props)
 	} = props;
 
 	let retData = [];
+	let xAxisVals = [];
 	let retPastData = []
 	let data=[];
 	let formattedTrackedItem;
@@ -230,7 +236,9 @@ function BuildPlot(props)
 			sortedKeys.forEach((sortkey)=>
 			{
 				let index = unsorted.findIndex((obj) => new Date(Object.keys(obj)[0]).getTime() === new Date(sortkey).getTime());
-				retData.push({x: new Date(sortkey), y: Object.values(unsorted[index])[0]});
+				const x = new Date(sortkey);
+				retData.push({x: x, y: Object.values(unsorted[index])[0]});
+				if (!xAxisVals.includes(x)) xAxisVals.push(x);
 			});
 			// sortedPastKeys.forEach((sortkey) =>
 			// {
@@ -279,7 +287,7 @@ function BuildPlot(props)
 				onMouseLeave={(e) => {setHintData(null)}}
 			>
 				<HorizontalGridLines />
-				<XAxis tickLabelAngle={-30} tickFormat={v => createDateString(v)} totalTicks={retData.length}/>
+				<XAxis tickLabelAngle={-30} tickValues={xAxisVals} tickFormat={v => createDateString(v)} totalTicks={retData.length}/>
 				<YAxis tickFormat={val => Math.round(val) === val ? val : ""}/>
 				<LineMarkSeries
 					curve="curveLinear"
