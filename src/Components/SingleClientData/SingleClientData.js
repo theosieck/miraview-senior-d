@@ -7,6 +7,8 @@ import { Alert, Button, CircularProgress, Divider, Stack, ToggleButton, ToggleBu
 import {XYPlot, AreaSeries, LineSeries, LineMarkSeries, XAxis, YAxis, VerticalGridLines, HorizontalGridLines, Hint, DiscreteColorLegend} from 'react-vis';
 import { getClientData } from '../../firebase/Firebase';
 import "./SingleClientData.css"
+import "react-vis/dist/style.css";
+
 const d3 = require('d3');
 
 const createDateString = (value) =>
@@ -119,7 +121,6 @@ const PCL5Chart = (props) => {
 	<XYPlot xType="time" stackBy="y" width={width} height={height}
 		onMouseLeave={(e) => {setHintData(null)}}
 	>
-	<VerticalGridLines />
 	<HorizontalGridLines />
 	<XAxis tickLabelAngle={-30} tickFormat={v => createDateString(v)}/>
 	<YAxis/>
@@ -277,7 +278,6 @@ function BuildPlot(props)
 			<XYPlot yDomain={[0,max]} width={width} height={height} style={{maxWidth: 'inherit'}}
 				onMouseLeave={(e) => {setHintData(null)}}
 			>
-				<VerticalGridLines />
 				<HorizontalGridLines />
 				<XAxis tickLabelAngle={-30} tickFormat={v => createDateString(v)} totalTicks={retData.length}/>
 				<YAxis tickFormat={val => Math.round(val) === val ? val : ""}/>
