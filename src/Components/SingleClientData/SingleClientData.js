@@ -195,6 +195,7 @@ function BuildPlot(props)
 
 	let retData = [];
 	let retPastData = []
+	let data=[];
 	let formattedTrackedItem;
 
 	const [hintData, setHintData] = useState(null);
@@ -262,20 +263,24 @@ function BuildPlot(props)
 		setHintData(hint);
 	}
 
+	retData.map(coordinate=>(data.push(coordinate.y)));
+	let max=parseInt(Math.max.apply(null,data));
+	if (parseInt(Math.max.apply(null,data))<3){
+		max=3;
+	}
 	return (
 		<div>
 			<h3>{formattedTrackedItem}</h3>
 
 			{!dataExists && dataExists == false && 
 			<Alert variant="filled" severity="info"> No data exists </Alert>}
-
-			<XYPlot width={width} height={height} style={{maxWidth: 'inherit'}}
+			<XYPlot yDomain={[0,max]} width={width} height={height} style={{maxWidth: 'inherit'}}
 				onMouseLeave={(e) => {setHintData(null)}}
 			>
 				<VerticalGridLines />
 				<HorizontalGridLines />
-				<XAxis tickLabelAngle={-30} tickFormat={v => createDateString(v)}/>
-				<YAxis/>
+				<XAxis tickLabelAngle={-30} tickFormat={v => createDateString(v)} totalTicks={retData.length}/>
+				<YAxis tickFormat={val => Math.round(val) === val ? val : ""}/>
 				<LineMarkSeries
 					curve="curveLinear"
 					data={retData}
