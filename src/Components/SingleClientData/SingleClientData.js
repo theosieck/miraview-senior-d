@@ -7,6 +7,8 @@ import { Alert, Button, CircularProgress, Divider, Stack, ToggleButton, ToggleBu
 import {XYPlot, AreaSeries, LineSeries, LineMarkSeries, XAxis, YAxis, VerticalGridLines, HorizontalGridLines, Hint, DiscreteColorLegend} from 'react-vis';
 import { getClientData } from '../../firebase/Firebase';
 import "./SingleClientData.css"
+import "react-vis/dist/style.css";
+
 const d3 = require('d3');
 
 const createDateString = (value) =>
@@ -70,13 +72,17 @@ const PCL5Chart = (props) => {
 	{
 		let sortedKeys = formatData(retrievedInfo.PCL5[key]);
 		let data = [];
+		const dates = [];
 		sortedKeys.forEach((sortkey) =>
 		{
 			let index = retrievedInfo.PCL5[key].findIndex((obj) => new Date(Object.keys(obj)[0]).getTime() === new Date(sortkey).getTime());
 
-			data.push({x: new Date(sortkey), y: Object.values(retrievedInfo.PCL5[key][index])[0]});
+			const x = new Date(sortkey);
+			data.push({x, y: Object.values(retrievedInfo.PCL5[key][index])[0]});
+			if (!dates.includes(x)) dates.push(x);
 		});
 		pcl5Obj[key] = data;
+		pcl5Obj.xAxisVals = dates;
 	}) : pcl5Obj = {};
 
 	// check whether data exists or not
@@ -98,15 +104,15 @@ const PCL5Chart = (props) => {
 
 	const setUpHint = (datapoint, e, type) => {
 		// console.log(datapoint, e);
-		const hint = {
-			x: e.event.clientX,
-			y: e.event.pageY,
-			date: datapoint.x,
-			val: datapoint.y,
-			type
-		}
-
-		setHintData(hint);
+		// const hint = {
+		// 	x: e.event.clientX,
+		// 	y: e.event.pageY,
+		// 	date: datapoint.x,
+		// 	val: datapoint.y,
+		// 	type
+		// }
+		datapoint.type = type;
+		setHintData(datapoint);
 	}
 
 	return (
@@ -115,13 +121,11 @@ const PCL5Chart = (props) => {
 	
 	{!dataExists && dataExists == false && 
 	<Alert variant="filled" severity="info"> No data exists </Alert>}
-
-	<XYPlot xType="time" stackBy="y" width={width} height={height}
+	{dataExists && <XYPlot xType="time" stackBy="y" width={width} height={height}
 		onMouseLeave={(e) => {setHintData(null)}}
 	>
-	<VerticalGridLines />
 	<HorizontalGridLines />
-	<XAxis tickLabelAngle={-30} tickFormat={v => createDateString(v)}/>
+	<XAxis tickValues={pcl5Obj.xAxisVals} tickFormat={(v) => createDateString(v)}/>
 	<YAxis/>
 	<AreaSeries
 	  className="area-series-example"
@@ -167,17 +171,15 @@ const PCL5Chart = (props) => {
 			if (onLine.current[3]) setUpHint(datapoint, e, 'Hyperarousal')
 		}}
 	/>
-	{hintData && <Paper className='single-client-data-hint' style={{
-		position: 'absolute',
-		left: `${hintData.x}px`,
-		top: `${hintData.y}px`
-	}}>
-			<h4>{hintData.type}</h4>
-			<p>{createDateString(hintData.date.getTime())}</p>
-			<p>Score: {hintData.val}</p>
-	</Paper>}
+	{hintData && <Hint value={hintData}>
+		<Paper className='single-client-data-hint'>
+				<h4>{hintData.type}</h4>
+				<p>{createDateString(hintData.x.getTime())}</p>
+				<p>Score: {hintData.y}</p>
+		</Paper>
+	</Hint>}
 	<DiscreteColorLegend items={legendItems} orientation='horizontal' className="single-client-data-legend single-client-data-legend-pcl5"/>
-  </XYPlot>
+  </XYPlot>}
   </div>);
 }
 
@@ -195,6 +197,7 @@ function BuildPlot(props)
 
 	let retData = [];
 	let retPastData = []
+	let data=[];
 	let formattedTrackedItem;
 
 	const [hintData, setHintData] = useState(null);
@@ -210,6 +213,35 @@ function BuildPlot(props)
 			strokeStyle: 'dashed'
 		}
 	]
+
+	// create the x-axis labels
+	const xAxisVals = [];
+	const hiddenLineData = [];
+	const today = new Date();
+	let period = 2;	// the number of days to step the axis by
+	let firstDay;
+	let lastDay = today;
+	if (timePeriod==='7days') firstDay = new Date(today.getTime() - 6.048e+8);
+	else if (timePeriod==='28days') {
+		firstDay = new Date(today.getTime() - 2.419e+9);
+		period = 4;
+	}
+	else if (timePeriod==='1week') {
+		const todayTmp = new Date();
+		const firstDayOfWeek = new Date(todayTmp.setDate(todayTmp.getDate() - todayTmp.getDay()));
+		firstDay = new Date(firstDayOfWeek.getTime() - 6.048e+8);
+		lastDay = firstDayOfWeek;
+	}
+	// add a value every 4 days
+	let currentDay = firstDay;
+	while (currentDay.getTime() <= lastDay.getTime()) {
+		xAxisVals.push(currentDay);
+		hiddenLineData.push({
+			x: currentDay,
+			y:1
+		});
+		currentDay = new Date(currentDay.getTime() + (86400000*period));
+	}
 
 	//if (!retrievedInfo) return 'Awaiting data';
 	let categories = Object.keys(retrievedInfo);
@@ -228,7 +260,8 @@ function BuildPlot(props)
 			sortedKeys.forEach((sortkey)=>
 			{
 				let index = unsorted.findIndex((obj) => new Date(Object.keys(obj)[0]).getTime() === new Date(sortkey).getTime());
-				retData.push({x: new Date(sortkey), y: Object.values(unsorted[index])[0]});
+				const x = new Date(sortkey);
+				retData.push({x: x, y: Object.values(unsorted[index])[0]});
 			});
 			// sortedPastKeys.forEach((sortkey) =>
 			// {
@@ -251,31 +284,34 @@ function BuildPlot(props)
 	}, [retData]);
 
 	const setUpHint = (datapoint, {event}) => {
-		console.log(event);
-		const hint = {
-			x: event.clientX,
-			y: event.pageY,
-			date: datapoint.x,
-			val: datapoint.y
-		}
+		// console.log(event);
+		// const hint = {
+		// 	x: event.screenX,
+		// 	y: event.screenY,
+		// 	date: datapoint.x,
+		// 	val: datapoint.y
+		// }
 
-		setHintData(hint);
+		setHintData(datapoint);
 	}
 
+	retData.map(coordinate=>(data.push(coordinate.y)));
+	let max=parseInt(Math.max.apply(null,data));
+	if (parseInt(Math.max.apply(null,data))<3){
+		max=3;
+	}
 	return (
 		<div>
 			<h3>{formattedTrackedItem}</h3>
 
 			{!dataExists && dataExists == false && 
 			<Alert variant="filled" severity="info"> No data exists </Alert>}
-
-			<XYPlot width={width} height={height} style={{maxWidth: 'inherit'}}
+			<XYPlot yDomain={[0,max]} width={width} height={height} style={{maxWidth: 'inherit'}}
 				onMouseLeave={(e) => {setHintData(null)}}
 			>
-				<VerticalGridLines />
 				<HorizontalGridLines />
-				<XAxis tickLabelAngle={-30} tickFormat={v => createDateString(v)}/>
-				<YAxis/>
+				<XAxis tickFormat={v => createDateString(v)} tickValues={xAxisVals}/>
+				<YAxis tickFormat={val => Math.round(val) === val ? val : ""}/>
 				<LineMarkSeries
 					curve="curveLinear"
 					data={retData}
@@ -283,14 +319,26 @@ function BuildPlot(props)
 					style={{fill: 'none'}}
 				>
 				</LineMarkSeries>
-				{hintData && <Paper className='single-client-data-hint' style={{
+				<LineMarkSeries
+					curve="curveLinear"
+					data={hiddenLineData}
+					style={{display: 'none'}}
+				>
+				</LineMarkSeries>
+				{hintData && <Hint value={hintData}>
+					<Paper className='single-client-data-hint'>
+						<p>{createDateString(hintData.x.getTime())}</p>
+						<p>{descriptor}: {hintData.y}</p>
+					</Paper>
+				</Hint>}
+				{/* {hintData && <Paper className='single-client-data-hint' style={{
 					position: 'absolute',
 					left: `${hintData.x}px`,
 					top: `${hintData.y}px`,
 				}}>
 					<p>{createDateString(hintData.date.getTime())}</p>
 					<p>{descriptor}: {hintData.val}</p>
-				</Paper>}
+				</Paper>} */}
 				<DiscreteColorLegend items={legendItems} orientation='horizontal' className="single-client-data-legend"/>
 			</XYPlot>
 		</div>
