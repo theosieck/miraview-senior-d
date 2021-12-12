@@ -19,19 +19,13 @@ text.rv-xy-plot__axis__tick__text
 }
 
 .rv-discrete-color-legend-item.horizontal {
-    display: flex;
+    display: flex !important;
     align-items: center;
     margin: 5px;
 }
 
 .rv-discrete-color-legend-item__title {
-    margin-left: 2px;
-}
-
-.single-client-data-legend-pcl5 .rv-discrete-color-legend-item__color {
-    height: 12px !important;
-    width: 12px !important;
-    margin-right: 2px;
+    margin-left: 2px !important;
 }
 
 .single-client-data-hint {

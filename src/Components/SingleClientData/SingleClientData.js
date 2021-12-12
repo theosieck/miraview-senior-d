@@ -104,15 +104,18 @@ const PCL5Chart = (props) => {
 
 	const setUpHint = (datapoint, e, type) => {
 		// console.log(datapoint, e);
-		// const hint = {
-		// 	x: e.event.clientX,
-		// 	y: e.event.pageY,
-		// 	date: datapoint.x,
-		// 	val: datapoint.y,
-		// 	type
-		// }
-		datapoint.type = type;
-		setHintData(datapoint);
+		const hint = {
+			x: datapoint.x,
+			y: datapoint.y,
+			type
+		}
+		// get all datapoints for this type
+		const allVals = pcl5Obj[type.replace(' ', '')];
+		// find the one for this day
+		const {x, y} = allVals.find(({x, y}) => x.getTime()===datapoint.x.getTime());
+		// set the actual score (since the datapoint is tracking the position on the graph)
+		hint.actualScore = y;
+		setHintData(hint);
 	}
 
 	return (
@@ -175,7 +178,8 @@ const PCL5Chart = (props) => {
 		<Paper className='single-client-data-hint'>
 				<h4>{hintData.type}</h4>
 				<p>{createDateString(hintData.x.getTime())}</p>
-				<p>Score: {hintData.y}</p>
+				<p>Category Score: {hintData.actualScore}</p>
+				<p>Total Score: {hintData.y}</p>
 		</Paper>
 	</Hint>}
 	<DiscreteColorLegend items={legendItems} orientation='horizontal' className="single-client-data-legend single-client-data-legend-pcl5"/>
