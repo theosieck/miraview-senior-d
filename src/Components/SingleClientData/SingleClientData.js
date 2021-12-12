@@ -4,12 +4,53 @@ import { Redirect } from "react-router-dom";
 import { auth } from '../../firebase/Firebase';
 import { Avatar, Grid, Paper } from "@material-ui/core";
 import { Alert, Button, CircularProgress, Divider, Stack, ToggleButton, ToggleButtonGroup } from "@mui/material";
-import {XYPlot, AreaSeries, LineSeries, LineMarkSeries, XAxis, YAxis, VerticalGridLines, HorizontalGridLines, Hint, DiscreteColorLegend} from 'react-vis';
+import {XYPlot, AreaSeries, LineSeries, LineMarkSeries, XAxis, YAxis, HorizontalGridLines, Hint, DiscreteColorLegend} from 'react-vis';
 import { getClientData } from '../../firebase/Firebase';
 import "./SingleClientData.css"
 import "react-vis/dist/style.css";
 
 const d3 = require('d3');
+
+const pcl5Colors = {
+	Intrusion:"#6ED2EC",
+	Avoidance:"#2D68DB",
+	NegativeFeelings:"#B777FF",
+	Hyperarousal:"#F976FE"
+}
+
+const getPCL5Category = (symptom) =>
+{
+	switch (symptom)
+	{
+		case "UnwantedMemories":
+		case "Nightmares":
+		case "Flashbacks":
+		case "EmotionalDistress":
+		case "PhysicalReactivity":
+			return "Intrusion";
+		case "AvoidanceFeelings":
+		case "AvoidanceReminders":
+			return "Avoidance";
+		case "InabilityToRecall":
+		case "OverlyNegativeThoughts":
+		case "ExaggeratedBlame":
+		case "NegativeAffect":
+		case "DecreasedInterest":
+		case "FeelingIsolated":
+		case "DifficultyExperiencingPositive":
+			return "NegativeFeelings";
+		case "Irritability":
+		case "RiskyBehavior":
+		case "Hypervigilance":
+		case "HeightenedStartle":
+    	case "DifficultyConcentrating":
+		case "DifficultySleeping":
+			return "Hyperarousal";
+		default:
+			return "Other";
+	}
+
+}
 
 const createDateString = (value) =>
 {
@@ -38,13 +79,6 @@ const PCL5Chart = (props) => {
 
 	let pcl5Obj = {};
 
-	const pcl5Colors = {
-		Intrusion:"#6ED2EC",
-		Avoidance:"#2D68DB",
-		NegativeFeelings:"#B777FF",
-		Hyperarousal:"#F976FE"
-	}
-
 	const legendItems = [
 		{
 			title:'Intrusion',
@@ -68,22 +102,34 @@ const PCL5Chart = (props) => {
 		}
 	]
 
+	let maxArray = [];
+
 	retrievedInfo && retrievedInfo.PCL5 ? Object.keys(retrievedInfo.PCL5).forEach((key)=>
 	{
 		let sortedKeys = formatData(retrievedInfo.PCL5[key]);
 		let data = [];
 		const dates = [];
-		sortedKeys.forEach((sortkey) =>
+		sortedKeys.forEach((sortkey, index) =>
 		{
-			let index = retrievedInfo.PCL5[key].findIndex((obj) => new Date(Object.keys(obj)[0]).getTime() === new Date(sortkey).getTime());
+			let i = retrievedInfo.PCL5[key].findIndex((obj) => new Date(Object.keys(obj)[0]).getTime() === new Date(sortkey).getTime());
 
 			const x = new Date(sortkey);
-			data.push({x, y: Object.values(retrievedInfo.PCL5[key][index])[0]});
+			data.push({x, y: Object.values(retrievedInfo.PCL5[key][i])[0]});
+			if (!maxArray[index]) maxArray[index] = [];
+			maxArray[index].push(Object.values(retrievedInfo.PCL5[key][i])[0]);
 			if (!dates.includes(x)) dates.push(x);
 		});
 		pcl5Obj[key] = data;
 		pcl5Obj.xAxisVals = dates;
+		pcl5Obj.yAxisMax = Math.min(80)
 	}) : pcl5Obj = {};
+
+	//calculating maximum y value for PCL5 graph
+	let newarr = [];
+	newarr = maxArray.map(arr => arr.reduce((a, b) => a + b));
+	console.log(newarr);
+	let max = newarr.length > 0 ? newarr.reduce((a,b) => Math.max(a, b)) : 80;
+	max = Math.ceil(max/10)*10;
 
 	// check whether data exists or not
 	let count = 0, total = 0;
@@ -93,7 +139,7 @@ const PCL5Chart = (props) => {
 		if (pcl5Obj[key].length == 0) {
 			count++
 		}
-	});
+	})
 	useEffect(() => {
 		if (count == total) {
 			setDataExists(false);
@@ -103,7 +149,6 @@ const PCL5Chart = (props) => {
 	}, []);
 
 	const setUpHint = (datapoint, e, type) => {
-		// console.log(datapoint, e);
 		// const hint = {
 		// 	x: e.event.clientX,
 		// 	y: e.event.pageY,
@@ -121,7 +166,7 @@ const PCL5Chart = (props) => {
 	
 	{!dataExists && dataExists == false && 
 	<Alert variant="filled" severity="info"> No data exists </Alert>}
-	{dataExists && <XYPlot xType="time" stackBy="y" width={width} height={height}
+	{dataExists && <XYPlot xType="time" yDomain={[0, Math.min(80, max)]} stackBy="y" width={width} height={height}
 		onMouseLeave={(e) => {setHintData(null)}}
 	>
 	<HorizontalGridLines />
@@ -203,17 +248,6 @@ function BuildPlot(props)
 	const [hintData, setHintData] = useState(null);
 	const [dataExists, setDataExists] = useState(null);
 
-	const legendItems = [
-		{
-			title: legendTitle,
-			strokeStyle: 'solid'
-		},
-		{
-			title: 'previous period',
-			strokeStyle: 'dashed'
-		}
-	]
-
 	// create the x-axis labels
 	const xAxisVals = [];
 	const hiddenLineData = [];
@@ -243,11 +277,16 @@ function BuildPlot(props)
 		currentDay = new Date(currentDay.getTime() + (86400000*period));
 	}
 
+	let chosenColor = 'black';
 	//if (!retrievedInfo) return 'Awaiting data';
 	let categories = Object.keys(retrievedInfo);
 	if (!categories.includes(trackedItem)) console.log('ERROR, cannot track %s', trackedItem);
 	else
 	{
+		let symptomCategory = getPCL5Category(trackedItem);
+		console.log(symptomCategory)
+		if (symptomCategory !== "Other") chosenColor = pcl5Colors[symptomCategory];
+
 		let info = retrievedInfo[trackedItem];
 		let availableTimePeriods = Object.keys(info);
 		if (!availableTimePeriods.includes(timePeriod)) console.log('ERROR, cannot track %s at time period %s', trackedItem, timePeriod);
@@ -274,6 +313,19 @@ function BuildPlot(props)
 		}
 	}
 
+	const legendItems = [
+		{
+			color: chosenColor,
+			title: legendTitle,
+			strokeStyle: 'solid'
+		},
+		{
+			color: chosenColor,
+			title: 'previous period',
+			strokeStyle: 'dashed'
+		}
+	]
+
 	// check whether data exists or not
 	useEffect(() => {
 		if (retData.length == 0) {
@@ -284,21 +336,18 @@ function BuildPlot(props)
 	}, [retData]);
 
 	const setUpHint = (datapoint, {event}) => {
-		// console.log(event);
-		// const hint = {
-		// 	x: event.screenX,
-		// 	y: event.screenY,
-		// 	date: datapoint.x,
-		// 	val: datapoint.y
-		// }
 
 		setHintData(datapoint);
 	}
 
-	retData.map(coordinate=>(data.push(coordinate.y)));
-	let max=parseInt(Math.max.apply(null,data));
-	if (parseInt(Math.max.apply(null,data))<3){
-		max=3;
+	let max = 4;
+	if (trackedItem === 'Triggers' || trackedItem === 'GroundingExercises')
+	{
+		retData.map(coordinate=>(data.push(coordinate.y)));
+		max=parseInt(Math.max.apply(null,data));
+		if (parseInt(Math.max.apply(null,data))<3){
+			max=3;
+		}
 	}
 	return (
 		<div>
@@ -314,9 +363,11 @@ function BuildPlot(props)
 				<YAxis tickFormat={val => Math.round(val) === val ? val : ""}/>
 				<LineMarkSeries
 					curve="curveLinear"
+					color={chosenColor}
 					data={retData}
 					onValueMouseOver={ setUpHint }
-					style={{fill: 'none'}}
+					lineStyle={{fill: 'none'}}
+					markStyle={{fill: chosenColor}}
 				>
 				</LineMarkSeries>
 				<LineMarkSeries
@@ -347,7 +398,7 @@ function BuildPlot(props)
 
 export default function SingleClientData() {
 	const [alignment, setAlignment] = React.useState('7days');
-	const [selected, setSelected] = useState('Hypervigilance')
+	const [selected, setSelected] = useState('AvgSymptomsRating')
 	const [retrievedInfo, setRetrievedInfo] = useState(undefined);
 	const [width, setWidth] = useState(200);
 	const [height, setHeight] = useState(200);
@@ -399,16 +450,18 @@ export default function SingleClientData() {
 	}
 
 	const handleAlignment = (event, newAlignment) => {
+		console.log(newAlignment)
 		setAlignment(newAlignment);
 	};
 
-	const handleSelected = (event, newSelected) =>
+	const handleSelected = (event) =>
 	{
-		setSelected(newSelected);
+		setSelected(event.target.value);
 	}
 
-	const getTrackedSymptoms = (retrievedInfo) =>
+	const getTrackedSymptoms = (retrievedInfo, dateSpan) =>
 	{
+		console.log(retrievedInfo)
 		let allReturned = Object.keys(retrievedInfo);
 		let pclIndex = allReturned.indexOf('PCL5');
 		allReturned.splice(pclIndex, 1);
@@ -416,13 +469,18 @@ export default function SingleClientData() {
 		allReturned.splice(triggerIndex, 1);
 		let groundingIndex = allReturned.indexOf('GroundingExercises');
 		allReturned.splice(groundingIndex, 1);
-		let returnVal = [];
+		let returnedToggles = [];
 		allReturned.forEach((symptomCategory) =>
 		{
+			let symptomData = retrievedInfo[symptomCategory][dateSpan.toString()];
 			let stringVal = symptomCategory.split(/(?=[A-Z])/).join(' ');
-			returnVal.push(<ToggleButton value={symptomCategory}>{stringVal}</ToggleButton>);
+			if (symptomData.length > 0 && symptomData !== [])
+			{
+				let color = getPCL5Category(symptomCategory);
+				returnedToggles.push(<ToggleButton className={`symptomToggles ${color}`} value={symptomCategory} onClick={handleSelected}>{stringVal}</ToggleButton>)
+			}
 		});
-		return returnVal;
+		return returnedToggles;
 	}
 
 	return (
@@ -462,7 +520,7 @@ export default function SingleClientData() {
 						</Grid>
 						<Grid item xs={2}>
 							<ToggleButtonGroup orientation="vertical" exclusive value={selected} onChange={handleSelected}>
-								{retrievedInfo ? getTrackedSymptoms(retrievedInfo) : []}
+								{retrievedInfo && alignment ? getTrackedSymptoms(retrievedInfo, alignment) : []}
 							</ToggleButtonGroup>
 						</Grid>
 						<Grid item xs={5}>

@@ -44,3 +44,62 @@ text.rv-xy-plot__axis__tick__text
 .single-client-data-hint h4, .single-client-data-hint p {
     margin: 0;
 }
+
+button[aria-pressed="true"]
+{
+    font-weight: bold;
+}
+
+.symptomToggles.Other
+{
+    background-color: #9c9c9c59 !important;
+}
+.symptomToggles.Other[aria-pressed="true"]
+{
+    background-color: #9c9c9c !important;
+}
+
+.Intrusion
+{
+    /* color: #6ED2EC !important; */
+    background-color: #6ED2EC75 !important;
+}
+.Intrusion[aria-pressed="true"]
+{
+    background-color: #6ED2ECed !important;
+}
+
+.Avoidance
+{
+    /* color: #2D68DB !important; */
+    background-color: #2D68DB75 !important;
+}
+.Avoidance[aria-pressed="true"]
+{ 
+    background-color: #2D68DBc9 !important;
+}
+
+.NegativeFeelings
+{
+    /* color: #B777FF !important; */
+    background-color:#b777ff75 !important;
+}
+.NegativeFeelings[aria-pressed="true"]
+{
+    background-color:#b777ffc9 !important;
+}
+
+.Hyperarousal
+{
+    /* color: #F976FE !important; */
+    background-color: #F976FE75 !important;
+}
+.Hyperarousal[aria-pressed="true"]
+{
+    background-color: #F976FEc9 !important;
+}
+
+button.symptomToggles
+{
+    color: black !important;
+}
