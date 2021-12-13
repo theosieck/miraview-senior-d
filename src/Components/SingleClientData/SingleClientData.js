@@ -201,6 +201,7 @@ function BuildPlot(props)
 	let formattedTrackedItem;
 
 	const [hintData, setHintData] = useState(null);
+	const [pastHintData, setPastHintData] = useState(null);
 	const [dataExists, setDataExists] = useState(null);
 
 	const legendItems = [
@@ -254,22 +255,26 @@ function BuildPlot(props)
 		else
 		{
 			let unsorted = info[timePeriod];
-			//let unsortedPast = info[timePeriod+"PriorPeriod"];
+			let unsortedPast = info[timePeriod+"PriorPeriod"];
 			let sortedKeys = formatData(unsorted);
-			//let sortedPastKeys = formatData(unsortedPast)
+			let sortedPastKeys = formatData(unsortedPast)
 			sortedKeys.forEach((sortkey)=>
 			{
 				let index = unsorted.findIndex((obj) => new Date(Object.keys(obj)[0]).getTime() === new Date(sortkey).getTime());
 				const x = new Date(sortkey);
 				retData.push({x: x, y: Object.values(unsorted[index])[0]});
 			});
-			// sortedPastKeys.forEach((sortkey) =>
-			// {
-			// 	let index = unsortedPast.findIndex((obj) => new Date(Object.keys(obj)[0]).getTime() === new Date(sortkey).getTime());
-			// 	let date = new Date(sortkey);
-			// 	date.setDate(date.getDate() + 7);
-			// 	retPastData.push({x: date, y: Object.values(unsortedPast[index])[0]});
-			// })
+			sortedPastKeys.forEach((sortkey) =>
+			{
+				let index = unsortedPast.findIndex((obj) => new Date(Object.keys(obj)[0]).getTime() === new Date(sortkey).getTime());
+				let date = new Date(sortkey);
+				let increment = 7;
+				if (timePeriod === '28days') {
+					increment = 28;
+				}
+				date.setDate(date.getDate() + increment);
+				retPastData.push({x: date, y: Object.values(unsortedPast[index])[0]});
+			})
 			formattedTrackedItem = trackedItem.split(/(?=[A-Z])/).join(' ');
 		}
 	}
@@ -284,6 +289,8 @@ function BuildPlot(props)
 	}, [retData]);
 
 	const setUpHint = (datapoint, {event}) => {
+		console.log(datapoint);
+		setPastHintData(null);
 		// console.log(event);
 		// const hint = {
 		// 	x: event.screenX,
@@ -295,6 +302,50 @@ function BuildPlot(props)
 		setHintData(datapoint);
 	}
 
+	const setUpHintPast = (datapoint, {event}) => {
+		console.log(datapoint);
+		setHintData(datapoint);
+		let date = new Date(datapoint.x.getTime());
+		if (timePeriod === '28days') {
+			date.setDate(date.getDate() - 28);
+		} else {
+			date.setDate(date.getDate() - 7);
+		}
+		setPastHintData(date);
+		// console.log(event);
+		// const hint = {
+		// 	x: event.screenX,
+		// 	y: event.screenY,
+		// 	date: datapoint.x,
+		// 	val: datapoint.y
+		// }
+	}
+
+	const countEntries = (dataList, prevDataList) => {
+		let count = 0;
+		let prevCount = 0;
+		let diff = 0;
+		dataList.forEach((point) => {
+			count += point.y;
+		});
+		prevDataList.forEach((p) => {
+			prevCount += p.y;
+		});
+		if (trackedItem === 'AvgSymptomsRating'){
+			count = count / dataList.length;
+			prevCount = prevCount / dataList.length;
+		} 
+		diff = (count - prevCount) / prevCount;
+		return (<div style={{display: 'flex'}}>
+				<p>{count}</p>
+				{prevCount !== 0 ? <p style={{
+					paddingLeft: '12px',
+					color: 'grey',
+				}}>{`${(diff * 100).toFixed(1)}%`}</p> : <p></p>}
+			</div>
+		);
+	}
+
 	retData.map(coordinate=>(data.push(coordinate.y)));
 	let max=parseInt(Math.max.apply(null,data));
 	if (parseInt(Math.max.apply(null,data))<3){
@@ -303,11 +354,15 @@ function BuildPlot(props)
 	return (
 		<div>
 			<h3>{formattedTrackedItem}</h3>
+			{countEntries(retData, retPastData)}
 
 			{!dataExists && dataExists == false && 
 			<Alert variant="filled" severity="info"> No data exists </Alert>}
 			<XYPlot yDomain={[0,max]} width={width} height={height} style={{maxWidth: 'inherit'}}
-				onMouseLeave={(e) => {setHintData(null)}}
+				onMouseLeave={(e) => {
+					setHintData(null);
+					setPastHintData(null);
+				}}
 			>
 				<HorizontalGridLines />
 				<XAxis tickFormat={v => createDateString(v)} tickValues={xAxisVals}/>
@@ -321,13 +376,21 @@ function BuildPlot(props)
 				</LineMarkSeries>
 				<LineMarkSeries
 					curve="curveLinear"
+					strokeStyle="dashed"
+					data={retPastData}
+					onValueMouseOver={ setUpHintPast }
+					style={{fill: 'none'}}
+				>
+				</LineMarkSeries>
+				<LineMarkSeries
+					curve="curveLinear"
 					data={hiddenLineData}
 					style={{display: 'none'}}
 				>
 				</LineMarkSeries>
 				{hintData && <Hint value={hintData}>
 					<Paper className='single-client-data-hint'>
-						<p>{createDateString(hintData.x.getTime())}</p>
+						{pastHintData!== null ? <p>{createDateString(pastHintData.getTime())}</p> : <p>{createDateString(hintData.x.getTime())}</p>}
 						<p>{descriptor}: {hintData.y}</p>
 					</Paper>
 				</Hint>}
