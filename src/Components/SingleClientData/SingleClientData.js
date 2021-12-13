@@ -409,7 +409,7 @@ function BuildPlot(props)
 		} 
 		diff = (count - prevCount) / prevCount;
 		return (<div style={{display: 'flex'}}>
-				<p>{count}</p>
+				<p>{count.toFixed(1).replace('.0', '')}</p>
 				{prevCount !== 0 ? <p style={{
 					paddingLeft: '12px',
 					color: 'grey',
@@ -450,6 +450,7 @@ function BuildPlot(props)
 				</LineMarkSeries>
 				<LineMarkSeries
 					curve="curveLinear"
+					color={chosenColor}
 					strokeStyle="dashed"
 					data={retPastData}
 					onValueMouseOver={ setUpHintPast }
