@@ -338,7 +338,7 @@ function BuildPlot(props)
 
 	// check whether data exists or not
 	useEffect(() => {
-		if (retData.length == 0) {
+		if (retData.length === 0 && retPastData.length === 0) {
 			setDataExists(false);
 		} else {
 			setDataExists(true);
@@ -363,6 +363,11 @@ function BuildPlot(props)
 	if (trackedItem === 'Triggers' || trackedItem === 'GroundingExercises')
 	{
 		retData.map(coordinate=>(data.push(coordinate.y)));
+		max=parseInt(Math.max.apply(null,data));
+		if (parseInt(Math.max.apply(null,data))<3){
+			max = 3;
+		}
+		retPastData.map(coordinate=>(data.push(coordinate.y)));
 		max=parseInt(Math.max.apply(null,data));
 		if (parseInt(Math.max.apply(null,data))<3){
 			max=3;
