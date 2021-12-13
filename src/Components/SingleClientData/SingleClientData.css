@@ -97,3 +97,7 @@ button.symptomToggles
 {
     color: black !important;
 }
+
+.pcl5graph .rv-xy-plot__axis__tick:last-child .rv-xy-plot__axis__tick__text {
+    transform: translate(-15px,14px);
+}

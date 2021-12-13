@@ -170,7 +170,7 @@ const PCL5Chart = (props) => {
 	
 	{!dataExists && dataExists == false && 
 	<Alert variant="filled" severity="info"> No data exists </Alert>}
-	{dataExists && <XYPlot xType="time" yDomain={[0, Math.min(80, max)]} stackBy="y" width={width} height={height}
+	{dataExists && <XYPlot xType="time" yDomain={[0, Math.min(80, max)]} stackBy="y" className='pcl5graph' width={width} height={height}
 		onMouseLeave={(e) => {setHintData(null)}}
 	>
 	<HorizontalGridLines />
@@ -282,6 +282,11 @@ function BuildPlot(props)
 		});
 		currentDay = new Date(currentDay.getTime() + (86400000*period));
 	}
+	// add space at the right of the graph
+	hiddenLineData.push({
+		x: new Date(lastDay.getTime()),
+		y: 1
+	});
 
 	let chosenColor = 'black';
 	//if (!retrievedInfo) return 'Awaiting data';
